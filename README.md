@@ -32,9 +32,9 @@ One backend family. One PostgreSQL source of truth. Two polished frontends. Zero
 
 ## 🎬 Demo Video — click to watch
 
-<!-- OPTION B (active right now): video file committed to this repo.
-     GitHub renders this player inline. Just press ▶. -->
-<video src="./recording_20260915_14-09-15.mp4" controls="controls" muted="muted" playsinline="playsinline" style="max-width: 100%; border-radius: 12px;"></video>
+<!-- GitHub strips <video> tags with RELATIVE paths, so the video is attached
+     as a release asset and embedded via its absolute URL. Press ▶ to play. -->
+<video src="https://github.com/YADAV1825/Ginivibe-project/releases/download/demo-v1/recording_20260915_14-09-15.mp4" controls="controls" muted="muted" playsinline="playsinline" style="max-width: 100%; border-radius: 12px;"></video>
 
 > 👆 **Click ▶ above to play the demo directly on GitHub.**
 > File: [`recording_20260915_14-09-15.mp4`](./recording_20260915_14-09-15.mp4)
