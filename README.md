@@ -57,7 +57,6 @@ Folder-level map. Each service directory contains its own README with file-level
 
 ```
 Ginivibe-project/
-├── android/                  native Android shell and build artifacts
 ├── backend/
 │   ├── monolithic/           core API: auth, feed, chat, presence, search (port 3001)
 │   └── microservices/
@@ -86,8 +85,7 @@ Ginivibe-project/
 │   ├── registry/
 │   ├── styles/
 │   └── types/
-├── images/                   static showcase assets
-└── sidebar/                  shared sidebar design references
+└── images/                   static showcase assets
 ```
 
 Further reading: `ARCHITECTURE.md` (system design and onboarding), `FEED_SYSTEM.md`, `EVENTS_IMPLEMENTATION_COMPLETE.md`, `LIVE_MATCHING.md`, `NON_LIVE_MATCHING.md`, `ADS_SYSTEM.md`, `ADMIN_CONTROL_PLANE.md`, `ENTERPRISE.md`.
