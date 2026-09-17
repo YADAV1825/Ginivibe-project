@@ -32,45 +32,41 @@ One backend family. One PostgreSQL source of truth. Two polished frontends. Zero
 
 ## 🎬 Demo Video — click to watch
 
-<!-- GitHub strips <video> tags with RELATIVE paths, so the video is attached
-     as a release asset and embedded via its absolute URL. Press ▶ to play. -->
-<video src="https://github.com/YADAV1825/Ginivibe-project/releases/download/demo-v1/recording_20260915_14-09-15.mp4" controls="controls" muted="muted" playsinline="playsinline" style="max-width: 100%; border-radius: 12px;"></video>
+<!-- Verified: GitHub strips ALL <video> tags in READMEs, so the thumbnail below
+     links to the mp4's GitHub file page, which renders its own video player. -->
+[![▶ Watch the GiniVibe Demo — click to play](images/demo-thumbnail.png)](./recording_20260915_14-09-15.mp4)
 
-> 👆 **Click ▶ above to play the demo directly on GitHub.**
+> 👆 **Click the preview above** — it opens the video's GitHub page with a built-in player. 👆
 > File: [`recording_20260915_14-09-15.mp4`](./recording_20260915_14-09-15.mp4)
 > (Not the Android-specific video — this is the main product walkthrough.)
 
 <details>
-<summary><b>🎥 How is this video embedded? (3 options — click to expand)</b></summary>
+<summary><b>🎥 How is this video embedded? (verified facts — click to expand)</b></summary>
 
 <br>
 
-**Option A — YouTube (recommended for virality + fast page loads) ⭐**
-1. Upload the mp4 to YouTube as **Unlisted** (or Public).
-2. Take a thumbnail/screenshot, save it as `demo-thumbnail.png` in the repo root.
-3. Replace the `<video>` block above with:
+**What works today (active): clickable thumbnail → GitHub's own video player ✅**
+- The mp4 (`~43 MB`) is committed to this repo, and `images/demo-thumbnail.png`
+  (a real frame pulled from the video with ffmpeg) is the preview image.
+- Clicking it opens the file's GitHub page, which renders a **native player** — one click to watch.
+- ⚠️ Do **not** use `<video>` tags in a README: GitHub's sanitizer strips them completely
+  (verified against the rendered page HTML — the tag vanishes, relative *or* absolute URL).
+- ⚠️ Release-asset URLs (`releases/download/…`) serve as `application/octet-stream` +
+  `attachment`, so browsers **download** instead of streaming — fine as a download link,
+  useless as an embed.
+
+**Option A — YouTube (recommended final form, instant streaming) ⭐**
+1. Upload the mp4 to YouTube as **Unlisted** (or Public) and send the link.
+2. Swap the thumbnail link above to:
 ```markdown
-[![▶ Watch the GiniVibe Demo](demo-thumbnail.png)](https://www.youtube.com/watch?v=YOUR_VIDEO_ID)
+[![▶ Watch the GiniVibe Demo](images/demo-thumbnail.png)](https://www.youtube.com/watch?v=YOUR_VIDEO_ID)
 ```
-Visitors click the image → YouTube opens. Whole README stays lightning-fast.
+Visitors click → YouTube plays instantly, including on phones. No 43 MB download.
 
-**Option B — Video committed to this repo (what you see right now) ✅**
-- The mp4 (`~43 MB`) is pushed to git alongside the code.
-- The `<video src="./recording_20260915_14-09-15.mp4" controls>` tag renders a native,
-  **click-to-play player directly on the GitHub page** — no external site needed.
-- Works because the file is under GitHub's 100 MB hard limit (`git check-ignore` confirms
-  `*.mp4` is *not* git-ignored here).
-- Trade-off: every `git clone` downloads those ~43 MB. Totally fine for a small demo video,
-  but if you add more videos later, switch to Option A or Git LFS.
-
-**Option C — External URL (Cloudinary / S3 / Drive)**
-```html
-<video src="https://YOUR-CDN-URL/demo.mp4" controls style="max-width:100%"></video>
-```
-Same clickable player, zero repo bloat. (Google Drive preview links do *not* embed well — prefer YouTube or a CDN.)
-
-> **TL;DR:** keep Option B while the video is small. When you want reach, upload to YouTube
-> and swap in the clickable-thumbnail snippet from Option A.
+**Option B — GitHub's own attachment player (true inline, no YouTube)**
+1. On github.com, drag-drop the mp4 into any issue comment box (don't submit — just grab the URL).
+2. GitHub uploads it to `https://github.com/user-attachments/assets/…` — paste that bare URL
+   (or a `<video>` tag pointing at it) into the README and it renders a **true inline player**.
 
 </details>
 
