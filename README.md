@@ -10,9 +10,9 @@ A production-grade social media platform — responsive web app plus native Andr
 
 ## Demo
 
-[![Watch the GiniVibe demo](images/demo-thumbnail.png)](https://youtu.be/JZLE3S9hWN8)
+[![GiniVibe demo preview — click to watch the full video](images/demo-preview.gif)](https://youtu.be/JZLE3S9hWN8)
 
-Click the preview above to watch the product walkthrough on YouTube.
+Preview loops above — click it to watch the full walkthrough with sound on YouTube.
 
 ## Overview
 
