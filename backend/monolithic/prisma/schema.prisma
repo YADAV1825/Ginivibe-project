@@ -1,0 +1,573 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id                                            String               @id @default(uuid())
+  username                                      String               @unique
+  email                                         String               @unique
+  password                                      String
+  firstName                                     String?
+  lastName                                      String?
+  dob                                           String?
+  gender                                        String?
+  createdAt                                     DateTime             @default(now())
+  updatedAt                                     DateTime             @updatedAt
+  bio                                           String?
+  profilePic                                    String?
+  zodiacSign                                    String?
+  lastSeenAt                                    DateTime?
+  AdClick                                       AdClick[]
+  AdImpression                                  AdImpression[]
+  Block_Block_blockedIdToUser                   Block[]              @relation("Block_blockedIdToUser")
+  Block_Block_blockerIdToUser                   Block[]              @relation("Block_blockerIdToUser")
+  CallRequest_CallRequest_callerIdToUser        CallRequest[]        @relation("CallRequest_callerIdToUser")
+  CallRequest_CallRequest_receiverIdToUser      CallRequest[]        @relation("CallRequest_receiverIdToUser")
+  CallSession_CallSession_callerIdToUser        CallSession[]        @relation("CallSession_callerIdToUser")
+  CallSession_CallSession_receiverIdToUser      CallSession[]        @relation("CallSession_receiverIdToUser")
+  comments                                      Comment[]
+  ownedCommunities                              Community[]          @relation("CommunityOwner")
+  joinedCommunities                             CommunityMember[]
+  conversations                                 ConversationMember[]
+  Follow_Follow_followerIdToUser                Follow[]             @relation("Follow_followerIdToUser")
+  Follow_Follow_followingIdToUser               Follow[]             @relation("Follow_followingIdToUser")
+  likes                                         Like[]
+  MatchPreference                               MatchPreference?
+  sentMessages                                  Message[]
+  posts                                         Post[]
+  postViews                                     PostView[]
+  SeenCandidate_SeenCandidate_candidateIdToUser SeenCandidate[]      @relation("SeenCandidate_candidateIdToUser")
+  SeenCandidate_SeenCandidate_userIdToUser      SeenCandidate[]      @relation("SeenCandidate_userIdToUser")
+  interests                                     UserInterest[]
+}
+
+model Interest {
+  id           String        @id @default(uuid())
+  name         String        @unique
+  icon         String?
+  subInterests SubInterest[]
+}
+
+model SubInterest {
+  id         String         @id @default(uuid())
+  name       String
+  interestId String
+  interest   Interest       @relation(fields: [interestId], references: [id])
+  users      UserInterest[]
+
+  @@unique([name, interestId])
+}
+
+model UserInterest {
+  userId        String
+  subInterestId String
+  subInterest   SubInterest @relation(fields: [subInterestId], references: [id], onDelete: Cascade)
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, subInterestId])
+}
+
+model Post {
+  id          String     @id @default(uuid())
+  userId      String
+  communityId String?
+  title       String?
+  body        String?
+  mediaUrls   String[]   @default([])
+  contentType String     @default("text")
+  viewsCount  Int        @default(0)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  comments    Comment[]
+  likes       Like[]
+  community   Community? @relation(fields: [communityId], references: [id])
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  views       PostView[]
+
+  @@index([userId])
+  @@index([communityId])
+}
+
+model PostView {
+  id        String   @id @default(uuid())
+  postId    String
+  userId    String?
+  viewerKey String
+  createdAt DateTime @default(now())
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user      User?    @relation(fields: [userId], references: [id])
+
+  @@unique([postId, viewerKey])
+  @@index([postId])
+}
+
+model Comment {
+  id        String   @id @default(uuid())
+  postId    String
+  userId    String
+  body      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([postId])
+}
+
+model Like {
+  userId    String
+  postId    String
+  createdAt DateTime @default(now())
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, postId])
+}
+
+model Community {
+  id          String            @id @default(uuid())
+  name        String            @unique
+  description String?
+  category    String
+  categories  String[]          @default([])
+  imageUrl    String?
+  cityScope   String?
+  ownerId     String
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  owner       User              @relation("CommunityOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  members     CommunityMember[]
+  posts       Post[]
+}
+
+model CommunityMember {
+  userId      String
+  communityId String
+  joinedAt    DateTime  @default(now())
+  community   Community @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, communityId])
+}
+
+model Conversation {
+  id        String               @id @default(uuid())
+  isGroup   Boolean              @default(false)
+  title     String?
+  createdAt DateTime             @default(now())
+  updatedAt DateTime             @updatedAt
+  members   ConversationMember[]
+  messages  Message[]
+}
+
+model ConversationMember {
+  id             String       @id @default(uuid())
+  userId         String
+  conversationId String
+  // Group role: 'admin' (can rename, add/remove members, delete group) or
+  // 'member'. Ignored for 1:1 conversations. Group creators become 'admin'.
+  role           String       @default("member")
+  joinedAt       DateTime     @default(now())
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, conversationId])
+}
+
+model Message {
+  id             String       @id @default(uuid())
+  conversationId String
+  senderId       String
+  text           String
+  mediaUrl       String?
+  deliveredAt    DateTime?
+  readAt         DateTime?
+  createdAt      DateTime     @default(now())
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender         User         @relation(fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId])
+  @@index([conversationId, readAt])
+}
+
+model AdClick {
+  id              String        @id
+  advertisementId String
+  userId          String?
+  placementType   PlacementType
+  clickCost       Decimal       @db.Decimal(10, 4)
+  createdAt       DateTime      @default(now())
+  Advertisement   Advertisement @relation(fields: [advertisementId], references: [id], onDelete: Cascade)
+  User            User?         @relation(fields: [userId], references: [id])
+}
+
+model AdImpression {
+  id              String        @id
+  advertisementId String
+  userId          String?
+  placementType   PlacementType
+  impressionCost  Decimal       @db.Decimal(10, 4)
+  createdAt       DateTime      @default(now())
+  Advertisement   Advertisement @relation(fields: [advertisementId], references: [id], onDelete: Cascade)
+  User            User?         @relation(fields: [userId], references: [id])
+}
+
+model AdPlacement {
+  id              String        @id
+  advertisementId String
+  placementType   PlacementType
+  Advertisement   Advertisement @relation(fields: [advertisementId], references: [id], onDelete: Cascade)
+
+  @@unique([advertisementId, placementType])
+}
+
+model AdminAuditLog {
+  id             String    @id
+  adminId        String
+  action         String
+  resourceType   String
+  resourceId     String
+  organizationId String?
+  metadata       Json?
+  ipAddress      String?
+  userAgent      String?
+  createdAt      DateTime  @default(now())
+  AdminUser      AdminUser @relation(fields: [adminId], references: [id])
+}
+
+model AdminUser {
+  id            String          @id
+  email         String          @unique
+  password      String
+  firstName     String?
+  lastName      String?
+  role          PlatformRole    @default(REVIEWER)
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime
+  AdminAuditLog AdminAuditLog[]
+}
+
+model Advertisement {
+  id           String         @id
+  campaignId   String
+  creativeId   String
+  name         String
+  status       AdStatus       @default(DRAFT)
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime
+  AdClick      AdClick[]
+  AdImpression AdImpression[]
+  AdPlacement  AdPlacement[]
+  Campaign     Campaign       @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  Creative     Creative       @relation(fields: [creativeId], references: [id])
+}
+
+model BillingProfile {
+  id             String       @id
+  organizationId String       @unique
+  balance        Decimal      @default(0.00) @db.Decimal(10, 2)
+  currency       String       @default("INR")
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime
+  Organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+}
+
+model Block {
+  id                         String   @id
+  blockerId                  String
+  blockedId                  String
+  createdAt                  DateTime @default(now())
+  User_Block_blockedIdToUser User     @relation("Block_blockedIdToUser", fields: [blockedId], references: [id], onDelete: Cascade)
+  User_Block_blockerIdToUser User     @relation("Block_blockerIdToUser", fields: [blockerId], references: [id], onDelete: Cascade)
+
+  @@unique([blockerId, blockedId])
+}
+
+model CallRequest {
+  id                                String            @id
+  callerId                          String
+  receiverId                        String
+  status                            CallRequestStatus @default(PENDING)
+  createdAt                         DateTime          @default(now())
+  expiresAt                         DateTime
+  respondedAt                       DateTime?
+  User_CallRequest_callerIdToUser   User              @relation("CallRequest_callerIdToUser", fields: [callerId], references: [id], onDelete: Cascade)
+  User_CallRequest_receiverIdToUser User              @relation("CallRequest_receiverIdToUser", fields: [receiverId], references: [id], onDelete: Cascade)
+
+  @@index([callerId, status])
+  @@index([expiresAt])
+  @@index([receiverId, status])
+}
+
+model CallSession {
+  id                                String            @id
+  callRequestId                     String            @unique
+  callerId                          String
+  receiverId                        String
+  roomCode                          String            @unique
+  status                            CallSessionStatus @default(CREATED)
+  createdAt                         DateTime          @default(now())
+  startedAt                         DateTime?
+  endedAt                           DateTime?
+  User_CallSession_callerIdToUser   User              @relation("CallSession_callerIdToUser", fields: [callerId], references: [id], onDelete: Cascade)
+  User_CallSession_receiverIdToUser User              @relation("CallSession_receiverIdToUser", fields: [receiverId], references: [id], onDelete: Cascade)
+}
+
+model Campaign {
+  id             String          @id
+  organizationId String
+  name           String
+  objective      String?
+  status         CampaignStatus  @default(DRAFT)
+  budget         Decimal         @db.Decimal(10, 2)
+  startDate      DateTime
+  endDate        DateTime?
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime
+  Advertisement  Advertisement[]
+  Organization   Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  TargetingRule  TargetingRule?
+}
+
+model Creative {
+  id             String          @id
+  organizationId String
+  name           String
+  mediaType      MediaType
+  storageKey     String
+  headline       String?
+  description    String?
+  ctaText        String?
+  destinationUrl String?
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime
+  Advertisement  Advertisement[]
+  Organization   Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+}
+
+model EnterpriseUser {
+  id                 String               @id
+  email              String               @unique
+  password           String
+  firstName          String?
+  lastName           String?
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime
+  OrganizationMember OrganizationMember[]
+}
+
+model Event {
+  id             String          @id
+  title          String
+  description    String?
+  organizerId    String
+  startAt        DateTime
+  endAt          DateTime
+  mode           EventMode
+  meetingUrl     String?
+  platform       String?
+  venue          String?
+  location       String?
+  capacity       Int?
+  bannerImageUrl String?
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime
+  EventAttendee  EventAttendee[]
+  EventInterest  EventInterest[]
+  EventWaitlist  EventWaitlist[]
+
+  @@index([endAt])
+  @@index([mode])
+  @@index([organizerId])
+  @@index([startAt])
+}
+
+model EventAttendee {
+  id         String          @id
+  eventId    String
+  userId     String
+  rsvpStatus EventRSVPStatus
+  joinedAt   DateTime        @default(now())
+  Event      Event           @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@unique([eventId, userId])
+  @@index([eventId, rsvpStatus])
+  @@index([userId])
+}
+
+model EventInterest {
+  eventId       String
+  subInterestId String
+  Event         Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@id([eventId, subInterestId])
+  @@index([subInterestId])
+}
+
+model EventWaitlist {
+  id        String   @id
+  eventId   String
+  userId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime
+  Event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@unique([eventId, userId])
+  @@index([eventId, createdAt, id])
+  @@index([userId])
+}
+
+model Follow {
+  id                            String   @id @default(uuid())
+  followerId                    String
+  followingId                   String
+  status                        String   @default("PENDING")
+  createdAt                     DateTime @default(now())
+  updatedAt                     DateTime @updatedAt
+  message                       String?  @db.VarChar(500)
+  User_Follow_followerIdToUser  User     @relation("Follow_followerIdToUser", fields: [followerId], references: [id], onDelete: Cascade)
+  User_Follow_followingIdToUser User     @relation("Follow_followingIdToUser", fields: [followingId], references: [id], onDelete: Cascade)
+
+  @@unique([followerId, followingId])
+}
+
+model MatchPreference {
+  id              String   @id
+  userId          String   @unique
+  preferredGender String?
+  minAge          Int      @default(18)
+  maxAge          Int      @default(99)
+  maxDistance     Int?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime
+  User            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Organization {
+  id                 String               @id
+  name               String
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime
+  status             OrganizationStatus   @default(ACTIVE)
+  BillingProfile     BillingProfile?
+  Campaign           Campaign[]
+  Creative           Creative[]
+  OrganizationMember OrganizationMember[]
+}
+
+model OrganizationMember {
+  id             String         @id
+  organizationId String
+  userId         String
+  role           EnterpriseRole @default(VIEWER)
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime
+  Organization   Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  EnterpriseUser EnterpriseUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, userId])
+}
+
+model SeenCandidate {
+  id                                   String   @id
+  userId                               String
+  candidateId                          String
+  createdAt                            DateTime @default(now())
+  User_SeenCandidate_candidateIdToUser User     @relation("SeenCandidate_candidateIdToUser", fields: [candidateId], references: [id], onDelete: Cascade)
+  User_SeenCandidate_userIdToUser      User     @relation("SeenCandidate_userIdToUser", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, candidateId])
+}
+
+model TargetingRule {
+  id         String   @id
+  campaignId String   @unique
+  minAge     Int?
+  maxAge     Int?
+  locations  String[]
+  interests  String[]
+  genders    String[]
+  devices    String[]
+  Campaign   Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+}
+
+enum AdStatus {
+  DRAFT
+  PENDING_REVIEW
+  APPROVED
+  REJECTED
+  ACTIVE
+  PAUSED
+}
+
+enum CallRequestStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  EXPIRED
+  CANCELLED
+}
+
+enum CallSessionStatus {
+  CREATED
+  CONNECTING
+  ACTIVE
+  ENDED
+  FAILED
+}
+
+enum CampaignStatus {
+  DRAFT
+  PENDING_REVIEW
+  ACTIVE
+  PAUSED
+  COMPLETED
+  CANCELLED
+  REJECTED
+}
+
+enum EnterpriseRole {
+  OWNER
+  ADMIN
+  CAMPAIGN_MANAGER
+  ANALYST
+  VIEWER
+}
+
+enum EventMode {
+  ONLINE
+  OFFLINE
+}
+
+enum EventRSVPStatus {
+  INTERESTED
+  GOING
+  DECLINED
+}
+
+enum MediaType {
+  IMAGE
+  VIDEO
+}
+
+enum OrganizationStatus {
+  ACTIVE
+  SUSPENDED
+}
+
+enum PlacementType {
+  FEED
+  EXPLORE
+  MATCHING
+}
+
+enum PlatformRole {
+  SUPER_ADMIN
+  PLATFORM_ADMIN
+  REVIEWER
+  SUPPORT
+}

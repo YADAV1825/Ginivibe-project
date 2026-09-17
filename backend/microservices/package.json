@@ -1,0 +1,18 @@
+{
+  "name": "@ginivibe/microservices",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": ["events-service", "rooms-service"],
+  "scripts": {
+    "dev": "npm run dev --workspace @ginivibe/events-service",
+    "dev:events": "npm run dev --workspace @ginivibe/events-service",
+    "dev:rooms": "npm run dev --workspace @ginivibe/rooms-service",
+    "build": "npm run build --workspace @ginivibe/events-service && npm run build --workspace @ginivibe/rooms-service && npm --prefix ../monolithic run build",
+    "build:events": "npm run build --workspace @ginivibe/events-service",
+    "build:rooms": "npm run build --workspace @ginivibe/rooms-service",
+    "start": "npm run start --workspace @ginivibe/events-service",
+    "start:events": "npm run start --workspace @ginivibe/events-service",
+    "start:rooms": "npm run start --workspace @ginivibe/rooms-service",
+    "install:services": "npm install"
+  }
+}

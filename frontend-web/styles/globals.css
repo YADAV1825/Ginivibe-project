@@ -1,0 +1,949 @@
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&display=swap');
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+@custom-variant dark (&:is(.dark *));
+
+/* ============================================================
+   GiniVibe design tokens.
+   World: Lime Spark (#B6FF2E) blended into Champagne (#F8E7C9),
+   with Graphite (#23262F) ink. Lime is the action accent,
+   Deep Lime (#4D7C0F) is the text-safe accent on light surfaces,
+   neutrals stay in the champagne/graphite families. Dark-first
+   root; .light overrides below. Every legacy variable name is
+   preserved.
+   ============================================================ */
+
+:root {
+  --background: #16181d;
+  --foreground: #f8e7c9;
+  --card: #23262f;
+  --card-foreground: #f8e7c9;
+  --popover: #23262f;
+  --popover-foreground: #f8e7c9;
+  --primary: #b6ff2e;
+  --primary-foreground: #23262f;
+  --secondary: #2e313b;
+  --secondary-foreground: #f8e7c9;
+  --muted: #2e313b;
+  --muted-foreground: #a8acb8;
+  --accent: #b6ff2e;
+  --accent-foreground: #23262f;
+  --destructive: #d97757;
+  --destructive-foreground: #16181d;
+  --border: rgba(248, 231, 201, 0.14);
+  --input: #23262f;
+  --ring: #b6ff2e;
+  --radius: 0.625rem;
+
+  /* Product tokens (legacy names preserved) */
+  --color-background: #16181d;
+  --color-surface: #23262f;
+  --color-surface-elevated: #2e313b;
+  --color-text-primary: #f8e7c9;
+  --color-text-secondary: #d9cfae;
+  --color-text-muted: #a8acb8;
+  --color-border: rgba(248, 231, 201, 0.14);
+  --color-accent: #b6ff2e;
+  --color-accent-hover: #c8ff5c;
+  --color-on-accent: #23262f;
+  --color-primary: #b6ff2e;
+  --color-btn-bg: #b6ff2e;
+  --color-btn-hover: #c8ff5c;
+  --color-btn-ink: #23262f;
+  --color-error: #d97757;
+  --color-success: #b6ff2e;
+  --color-warning: #d9a441;
+
+  /* Information accent: champagne ink. Links, secondary highlights. */
+  --color-info: #f8e7c9;
+  --color-info-deep: #d9cfae;
+  --color-glow: rgba(182, 255, 46, 0.12);
+
+  /* Lime to champagne canvas (light landing world default). */
+  --gv-canvas: linear-gradient(115deg, #b6ff2e 0%, #d9f873 38%, #f8e7c9 82%);
+  --gv-panel: rgba(35, 38, 47, 0.78);
+  --gv-panel-border: rgba(248, 231, 201, 0.12);
+
+  /* Typography: one family, display and UI */
+  --font-sans: 'Bricolage Grotesque', system-ui, -apple-system, sans-serif;
+  --font-display: 'Bricolage Grotesque', system-ui, -apple-system, sans-serif;
+
+  /* Type scale */
+  --text-display: clamp(2.75rem, 6vw, 4.75rem);
+  --text-h1: clamp(2rem, 4vw, 3rem);
+  --text-h2: clamp(1.5rem, 2.6vw, 2.125rem);
+  --text-h3: 1.25rem;
+  --text-lead: 1.125rem;
+  --text-body: 1rem;
+  --text-small: 0.875rem;
+  --text-caption: 0.75rem;
+
+  /* Spacing */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-12: 3rem;
+
+  /* Radius: one coherent shape language */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --radius-full: 9999px;
+
+  /* Shadows (restrained, warm-tinted for dark surfaces) */
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.4);
+  --shadow-md: 0 8px 24px -8px rgb(0 0 0 / 0.55);
+  --shadow-lg: 0 24px 64px -16px rgb(0 0 0 / 0.6);
+
+  /* Glass */
+  --glass-bg: rgba(35, 38, 47, 0.82);
+  --glass-border: rgba(248, 231, 201, 0.1);
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --duration-fast: 150ms;
+  --duration-med: 280ms;
+}
+
+.light {
+  --background: #f8e7c9;
+  --foreground: #23262f;
+  --card: #fff9ec;
+  --card-foreground: #23262f;
+  --popover: #fff9ec;
+  --popover-foreground: #23262f;
+  --primary: #fffdf7;
+  --primary-foreground: #23262f;
+  --secondary: #eee0bd;
+  --secondary-foreground: #23262f;
+  --muted: #eee0bd;
+  --muted-foreground: #6b6f7d;
+  --accent: #b6ff2e;
+  --accent-foreground: #23262f;
+  --border: rgba(35, 38, 47, 0.14);
+  --input: #fff9ec;
+  --ring: #23262f;
+
+  --color-background: #f8e7c9;
+  --color-surface: #fff9ec;
+  --color-surface-elevated: #ffffff;
+  --color-text-primary: #23262f;
+  --color-text-secondary: #4b4f5c;
+  --color-text-muted: #6b6f7d;
+  --color-border: rgba(35, 38, 47, 0.14);
+  --color-accent: #4d7c0f;
+  --color-accent-hover: #3f6212;
+  --color-on-accent: #fff9ec;
+  --color-primary: #b6ff2e;
+  --color-btn-bg: #b6ff2e;
+  --color-btn-hover: #a3ee22;
+  --color-btn-ink: #23262f;
+  --color-info: #23262f;
+  --color-info-deep: #16181d;
+  --glass-bg: rgba(255, 249, 236, 0.88);
+  --glass-border: rgba(35, 38, 47, 0.12);
+  --color-glow: rgba(182, 255, 46, 0.25);
+  --gv-canvas: linear-gradient(115deg, #b6ff2e 0%, #d9f873 38%, #f8e7c9 82%);
+  --gv-panel: rgba(255, 249, 236, 0.88);
+  --gv-panel-border: rgba(35, 38, 47, 0.14);
+  --shadow-sm: 0 1px 2px rgb(35 38 47 / 0.08);
+  --shadow-md: 0 8px 24px -8px rgb(35 38 47 / 0.16);
+  --shadow-lg: 0 24px 64px -16px rgb(35 38 47 / 0.2);
+}
+
+@theme inline {
+  --font-sans: 'Bricolage Grotesque', system-ui, sans-serif;
+  --font-display: 'Bricolage Grotesque', system-ui, sans-serif;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--background);
+  color: var(--foreground);
+  transition: background-color 0.3s ease, color 0.3s ease;
+  line-height: 1.55;
+  /* clip (not hidden): cuts horizontal overflow WITHOUT turning body into
+     a second scroll container fighting the document scroller. */
+  overflow-x: clip;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Light app canvas: Lime Spark melting into Champagne, like landing.
+   Layout chrome stays transparent so the gradient breathes through. */
+.light body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(115deg, #b6ff2e 0%, #d9f873 38%, #f8e7c9 82%);
+  pointer-events: none;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+input, textarea, select {
+  font-family: inherit;
+}
+
+::selection {
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+}
+
+/* Visible keyboard focus everywhere */
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Display type: grotesque at high weight, for marketing + moments */
+.font-display {
+  font-family: var(--font-display);
+  font-optical-sizing: auto;
+  letter-spacing: -0.02em;
+}
+
+/* Glassmorphism & Layouts */
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+}
+
+/* Dashboard shell: Lime Spark melting into Champagne (lime dominant),
+   edge to edge behind content AND the floating notch nav — the landing
+   canvas. Ink stays graphite. */
+.layout-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+  background-color: #e2f789;
+  background-image: linear-gradient(115deg, #b6ff2e 0%, #d9f873 38%, #f8e7c9 82%);
+  color: var(--color-text-primary);
+}
+
+.main-content {
+  flex: 1;
+  overflow-y: auto;
+  position: relative;
+  padding: 92px var(--space-4) var(--space-8);
+}
+
+/* The app container: one big landing-style panel holding every section
+   (feed, matching, events…), so content never sits raw on the lime.
+   Mirrors .gv-hero-panel: warm off-white, blur, 24px radius, soft shadow. */.app-container {
+  width: 100%;
+  max-width: 1200px;
+  min-height: 100%;
+  margin: 0 auto;
+  padding: clamp(20px, 3.5vw, 44px);
+  border-radius: 24px;
+  background: rgba(255, 251, 240, 0.88);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(35, 38, 47, 0.14);
+  box-shadow: 0 24px 64px -28px rgba(35, 38, 47, 0.35);
+  /* White cards on the cream container (landing match-card language). */
+  --color-surface: #ffffff;
+  --color-surface-elevated: #faf0d7;
+  --glass-bg: rgba(255, 255, 255, 0.94);
+}
+
+/* Gini AI pages: landing-style WHITE card instead of cream.
+   Toggled per-page (added on mount, removed on unmount). */
+.app-container.gv-gini-white {
+  background: rgba(255, 255, 255, 0.95);
+  --color-surface-elevated: #f4f6ec;
+}
+
+@media (max-width: 640px) {
+  /* Notch pill docks to the bottom on mobile: clearance goes below. */
+  .main-content {
+    padding: var(--space-4) 12px 100px;
+  }
+  .app-container {
+    border-radius: 20px;
+    padding: 20px 14px;
+  }
+}
+
+/* Scrollbar styling */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+*::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 8px;
+  border: 2px solid var(--background);
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Subtle scroll reveal, driven by IntersectionObserver, never scroll listeners */
+.reveal {
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity var(--duration-med) var(--ease-out),
+    transform var(--duration-med) var(--ease-out);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* GiniVibe label chip: graphite pill, lime ink, lime-tint border.
+   Replaces multicolor icon squares on cards. */
+.gv-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: #23262f;
+  color: #b6ff2e;
+  border: 1px solid color-mix(in srgb, #b6ff2e 45%, transparent);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* Staggered entrance for cards: set style={{ '--enter-delay': '80ms' }}. */
+@keyframes gv-rise {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: none; }
+}
+
+.gv-rise {
+  animation: gv-rise 480ms var(--ease-out) both;
+  animation-delay: var(--enter-delay, 0ms);
+}
+
+/* Hover lift for clickable cards (transform, never scale). */
+.gv-lift {
+  transition: transform var(--duration-med) var(--ease-out),
+    box-shadow var(--duration-med) var(--ease-out),
+    border-color var(--duration-fast) var(--ease-out);
+}
+
+.gv-lift:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+  border-color: color-mix(in srgb, #b6ff2e 45%, var(--color-border));
+}
+
+/* Keyframes */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ============================================================
+   Matching pixel stage (matching route only).
+   Toggled from MatchingDashboard while the picker grid is visible:
+   .gv-pixel-shell on .layout-container, .gv-pixel-panel on .app-container.
+   Every other dashboard page keeps the lime/champagne shell untouched.
+   ============================================================ */
+.layout-container.gv-pixel-shell {
+  background-color: #030303;
+  background-image: none;
+}
+
+.app-container.gv-pixel-panel {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  overflow: hidden;
+  position: relative;
+  background: #030303;
+  border-color: rgba(182, 255, 46, 0.22);
+  --color-surface: #141607;
+  --color-surface-elevated: #1d2210;
+}
+
+.gv-pixel-stage {
+  position: relative;
+  flex: 1;
+  display: flex;
+  border-radius: inherit;
+  overflow: hidden;
+  min-height: 100%;
+}
+
+.gv-pixel-bg {
+  position: absolute;
+  inset: 0;
+}
+
+.gv-pixel-veil {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(3, 3, 3, 0.55),
+    rgba(3, 3, 3, 0.22) 42%,
+    rgba(3, 3, 3, 0.55)
+  );
+  pointer-events: none;
+}
+
+.gv-pixel-content {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: var(--space-6);
+}
+
+@media (max-width: 640px) {
+  .gv-pixel-content {
+    padding: 20px 14px 32px;
+  }
+}
+
+.gv-pixel-title {
+  color: #f8e7c9;
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0 0 var(--space-2) 0;
+  letter-spacing: -0.01em;
+}
+
+.gv-pixel-sub {
+  color: rgba(248, 231, 201, 0.72);
+  font-size: 1.125rem;
+  margin: 0;
+}
+
+/* ============================================================
+   Matching full-bleed picker (matching route only).
+   Toggled from MatchingDashboard while the picker is visible:
+   .gv-match-bleed on .app-container. The cream panel chrome is
+   removed and .gv-match-stage breaks out of .main-content padding
+   with negative margins, so the pixel field floods edge to edge.
+   Candidate view (non-picker) restores the normal panel.
+   ============================================================ */
+.app-container.gv-match-bleed {
+  max-width: none;
+  padding: 0;
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border-radius: 0;
+}
+
+.gv-match-stage {
+  position: relative;
+  margin: -92px calc(-1 * var(--space-4)) calc(-1 * var(--space-8));
+  min-height: calc(100dvh - 92px);
+  padding: 112px clamp(16px, 4vw, 56px) 72px clamp(12px, 2.5vw, 40px);
+  overflow: clip;
+}
+
+.gv-match-bg {
+  /* Viewport-pinned so the field floods the whole screen even when the
+     picker content is short — never a black band below the pixels.
+     z-index 0 keeps it above the shell background but below all content. */
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+}
+
+.gv-match-veil {
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(3, 3, 3, 0.62),
+    rgba(3, 3, 3, 0.28) 42%,
+    rgba(3, 3, 3, 0.62)
+  );
+  pointer-events: none;
+}
+
+.gv-match-content {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 1120px;
+  margin: 0;
+}
+
+@media (max-width: 640px) {
+  .gv-match-stage {
+    margin: calc(-1 * var(--space-4)) -12px -100px;
+    min-height: calc(100dvh - 116px);
+    padding: 28px 16px 56px;
+  }
+}
+
+/* ============================================================
+   Search ripple stage (search route only).
+   Toggled from SearchPage while mounted: .gv-search-shell on
+   .layout-container, .gv-search-bleed on .app-container.
+   The water-ripple canvas is viewport-pinned; a soft cream veil
+   keeps the search UI readable over the bright meadow scene.
+   ============================================================ */
+.layout-container.gv-search-shell {
+  background-color: #a8d8ea;
+  background-image: linear-gradient(160deg, #8ecae6 0%, #bfe6ef 45%, #d9f2e3 100%);
+}
+
+.app-container.gv-search-bleed {
+  max-width: none;
+  padding: 0;
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border-radius: 0;
+}
+
+.gv-search-stage {
+  position: relative;
+  margin: -92px calc(-1 * var(--space-4)) calc(-1 * var(--space-8));
+  min-height: calc(100dvh - 92px);
+  padding: 104px clamp(16px, 4vw, 48px) 64px;
+  overflow: clip;
+}
+
+.gv-search-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+}
+
+.gv-search-bg canvas {
+  transition: opacity 0.55s ease;
+}
+
+.gv-search-bg canvas.gv-ripple-hidden {
+  opacity: 0;
+}
+
+.gv-search-veil {
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 251, 240, 0.42),
+    rgba(255, 251, 240, 0.1) 38%,
+    rgba(23, 32, 44, 0.3)
+  );
+  pointer-events: none;
+}
+
+.gv-search-content {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+}
+
+@media (max-width: 640px) {
+  .gv-search-stage {
+    margin: calc(-1 * var(--space-4)) -12px -100px;
+    min-height: calc(100dvh - 116px);
+    padding: 24px 14px 48px;
+  }
+}
+
+/* ============================================================
+   Feed reels stage (feed route only).
+   Toggled from FeedDashboard while mounted: .gv-feed-bleed on
+   .app-container. The lime shell stays as the fixed backdrop;
+   .gv-feed-bg adds fixed soft washes that never scroll.
+   Post cards are solid and opaque so the sticky stack overlaps
+   cleanly with no blending.
+   ============================================================ */
+.app-container.gv-feed-bleed {
+  max-width: none;
+  padding: 0;
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border-radius: 0;
+}
+
+.gv-feed-stage {
+  position: relative;
+  margin: -92px calc(-1 * var(--space-4)) calc(-1 * var(--space-8));
+  min-height: calc(100dvh - 92px);
+  padding: 104px clamp(16px, 4vw, 48px) 64px;
+  overflow: clip;
+}
+
+/* Native one-card paging for the feed reels. Toggled on .main-content
+   only while the reel stream is mounted; removed on unmount so no
+   other route is affected. */
+.main-content.gv-feed-snap {
+  -webkit-scroll-snap-type: y mandatory;
+  scroll-snap-type: y mandatory;
+}
+
+.gv-feed-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(640px 420px at 12% 8%, rgba(255, 255, 255, 0.35), transparent 70%),
+    radial-gradient(720px 480px at 88% 32%, rgba(255, 255, 255, 0.22), transparent 70%),
+    radial-gradient(800px 600px at 50% 100%, rgba(35, 38, 47, 0.08), transparent 70%);
+}
+
+.gv-feed-content {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+}
+
+@media (max-width: 640px) {
+  .gv-feed-stage {
+    margin: calc(-1 * var(--space-4)) -12px -100px;
+    min-height: calc(100dvh - 116px);
+    padding: 24px 12px 48px;
+  }
+}
+
+/* ============================================================
+   Matching live room: embedded wide dual-pane call (no fullscreen).
+   ============================================================ */
+.gv-live-room {
+  width: 100%;
+  max-width: 1020px;
+  margin: 0 auto;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 20px;
+  padding: clamp(16px, 3vw, 28px);
+  box-shadow: var(--shadow-lg);
+}
+
+.gv-live-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.gv-live-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: #23262f;
+  color: #fff;
+  font-weight: 800;
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  padding: 6px 12px;
+  border-radius: 999px;
+}
+
+.gv-live-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ff5d5d;
+  animation: gv-blink 1.4s ease-in-out infinite;
+}
+
+@keyframes gv-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+.gv-live-status {
+  color: var(--color-text-secondary);
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+
+.gv-live-roomcode {
+  margin-left: auto;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border);
+  padding: 4px 10px;
+  border-radius: 8px;
+}
+
+.gv-live-panes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+@media (max-width: 720px) {
+  .gv-live-panes {
+    grid-template-columns: 1fr;
+  }
+}
+
+.gv-live-pane {
+  min-width: 0;
+}
+
+.gv-live-frame {
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #101208;
+  border: 1px solid rgba(35, 38, 47, 0.2);
+  aspect-ratio: 4 / 3;
+  min-height: 260px;
+}
+
+.gv-live-pixels {
+  position: absolute;
+  inset: 0;
+}
+
+.gv-live-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.gv-live-video-mirror {
+  transform: scaleX(-1);
+}
+
+.gv-live-tag {
+  position: absolute;
+  left: 12px;
+  top: 12px;
+  z-index: 3;
+}
+
+.gv-live-waiting {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  text-align: center;
+  padding: 16px;
+}
+
+.gv-live-avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #b6ff2e;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
+  background: #23262f;
+}
+
+.gv-live-avatar-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #b6ff2e;
+  font-size: 1.6rem;
+  font-weight: 800;
+}
+
+.gv-live-waiting-name,
+.gv-live-waiting-sub {
+  background: rgba(20, 22, 7, 0.74);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border-radius: 999px;
+  padding: 7px 16px;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gv-live-waiting-name {
+  color: #f8e7c9;
+  font-weight: 800;
+  font-size: 1rem;
+}
+
+.gv-live-waiting-sub {
+  color: rgba(248, 231, 201, 0.75);
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.gv-live-off {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: #101208;
+  color: rgba(248, 231, 201, 0.7);
+  font-weight: 600;
+  font-size: 0.92rem;
+}
+
+.gv-live-off-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(248, 231, 201, 0.08);
+  border: 1px solid rgba(248, 231, 201, 0.16);
+}
+
+.gv-live-note {
+  margin: 12px 0 0;
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+  background: rgba(217, 164, 65, 0.12);
+  border: 1px solid rgba(217, 164, 65, 0.4);
+  padding: 10px 14px;
+  border-radius: 12px;
+}
+
+.gv-live-controls {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  align-items: center;
+  margin-top: 18px;
+}
+
+.gv-live-round {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface-elevated);
+  color: var(--color-text-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform var(--duration-med) var(--ease-out),
+    background-color var(--duration-fast) var(--ease-out);
+}
+
+.gv-live-round:hover {
+  transform: translateY(-2px);
+}
+
+.gv-live-round.is-off {
+  background: rgba(217, 119, 87, 0.15);
+  color: #b0512f;
+  border-color: rgba(217, 119, 87, 0.5);
+}
+
+.gv-live-end {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 26px;
+  border-radius: 999px;
+  background: var(--color-error);
+  color: #fff;
+  font-weight: 700;
+  font-size: 1rem;
+  border: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

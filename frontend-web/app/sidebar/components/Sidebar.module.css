@@ -1,0 +1,276 @@
+/* ============================================================
+   GiniVibe notch nav — a single floating pill, pinned top-center.
+   Logo notch left, live section switcher center, identity right.
+   The pill is fully convex (border-radius: 999px) on purpose:
+   zones split with inset dividers, so there are no concave
+   notch cutouts and no corner artifacts on any background.
+   Colors ride the app tokens: cream card, graphite ink, lime pop.
+   ============================================================ */
+
+.notchBar {
+  position: fixed;
+  top: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: max-content;
+  max-width: min(700px, calc(100vw - 24px));
+  min-height: 60px;
+  padding: 6px 8px;
+  border-radius: 999px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-md);
+}
+
+/* ---- Left notch: brand ---- */
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 14px 6px 6px;
+  border-radius: 999px;
+  color: var(--color-text-primary);
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  transition: background-color var(--duration-fast) var(--ease-out);
+}
+
+.brand:hover {
+  background: var(--color-surface-elevated);
+}
+
+.brandMark {
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  overflow: hidden;
+  flex-shrink: 0;
+  border: 2px solid #b6ff2e;
+  background: var(--color-surface-elevated);
+}
+
+.brandMark img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.brandName {
+  font-size: 1.05rem;
+}
+
+/* Inset divider between pill zones — never an outer cutout. */
+.zoneDivider {
+  width: 1px;
+  align-self: stretch;
+  margin: 10px 2px;
+  background: var(--color-border);
+  flex-shrink: 0;
+}
+
+/* ---- Center notch: dynamic section switcher ---- */
+.sectionWrap {
+  position: relative;
+  display: flex;
+  min-width: 0;
+}
+
+.sectionTrigger {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  max-width: 300px;
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: transparent;
+  border: none;
+  color: var(--color-text-primary);
+  font-size: 0.95rem;
+  font-weight: 700;
+  white-space: nowrap;
+  transition: background-color var(--duration-fast) var(--ease-out);
+}
+
+.sectionTrigger:hover {
+  background: var(--color-surface-elevated);
+}
+
+.sectionTriggerIcon {
+  flex-shrink: 0;
+  color: var(--color-accent);
+}
+
+.sectionTriggerLabel {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sectionChevron {
+  flex-shrink: 0;
+  color: var(--color-text-muted);
+  transition: transform var(--duration-fast) var(--ease-out);
+}
+
+.sectionChevronOpen {
+  transform: rotate(180deg);
+}
+
+.sectionMenu {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 61;
+  width: 264px;
+  max-height: min(60vh, 420px);
+  overflow-y: auto;
+  padding: 8px;
+  border-radius: 18px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-lg);
+}
+
+.sectionList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sectionDivider {
+  height: 1px;
+  margin: 8px 10px;
+  background: var(--color-border);
+}
+
+.sectionItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  color: var(--color-text-secondary);
+  font-size: 0.925rem;
+  font-weight: 600;
+  transition: background-color var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out);
+}
+
+.sectionItem:hover {
+  background: var(--color-surface-elevated);
+  color: var(--color-text-primary);
+}
+
+.sectionItemActive {
+  background: color-mix(in srgb, #b6ff2e 38%, var(--color-surface));
+  color: var(--color-text-primary);
+}
+
+.sectionCheck {
+  margin-left: auto;
+  flex-shrink: 0;
+  color: var(--color-accent);
+}
+
+/* ---- Right notch: identity + sign out ---- */
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding-left: 6px;
+}
+
+.avatarLink {
+  display: flex;
+  border-radius: 999px;
+  padding: 3px;
+  transition: background-color var(--duration-fast) var(--ease-out);
+}
+
+.avatarLink:hover {
+  background: var(--color-surface-elevated);
+}
+
+.avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  object-fit: cover;
+  display: block;
+  border: 2px solid #b6ff2e;
+}
+
+.avatarFallback {
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-surface-elevated);
+  color: var(--color-text-secondary);
+  border: 2px solid #b6ff2e;
+}
+
+.signOut {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  background: transparent;
+  border: none;
+  color: var(--color-text-secondary);
+  transition: background-color var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out);
+}
+
+.signOut:hover {
+  background: var(--color-surface-elevated);
+  color: var(--color-text-primary);
+}
+
+/* ---- Mid widths: keep the pill compact ---- */
+@media (max-width: 860px) {
+  .brandName {
+    display: none;
+  }
+  .brand {
+    padding-right: 6px;
+  }
+  .sectionTrigger {
+    max-width: 220px;
+  }
+}
+
+/* ---- Mobile: the same pill docks to the bottom, menu opens up ---- */
+@media (max-width: 640px) {
+  .notchBar {
+    top: auto;
+    bottom: 10px;
+    left: 12px;
+    right: 12px;
+    transform: none;
+    width: auto;
+    max-width: none;
+    justify-content: space-between;
+  }
+  .sectionTrigger {
+    max-width: none;
+  }
+  .sectionMenu {
+    top: auto;
+    bottom: calc(100% + 10px);
+  }
+}

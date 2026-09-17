@@ -1,0 +1,55 @@
+/* GiniVibe avatars: graphite initials on pastel washes, cream ring. */
+
+.avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  font-weight: 700;
+  color: #23262f;
+  border: 2px solid #fffdf7;
+  overflow: hidden;
+  flex-shrink: 0;
+  user-select: none;
+}
+
+.toneA { background: #e7dcf6; }
+.toneB { background: #f3e2c9; }
+.toneC { background: #dff3b8; }
+.toneD { background: #d9e6f5; }
+
+.photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.xs { width: 24px; height: 24px; font-size: 0.6rem; }
+.sm { width: 30px; height: 30px; font-size: 0.7rem; }
+.md { width: 38px; height: 38px; font-size: 0.85rem; }
+.lg { width: 52px; height: 52px; font-size: 1.05rem; }
+
+.stack {
+  display: inline-flex;
+  align-items: center;
+}
+
+.stackItem + .stackItem,
+.stackItem + .more,
+.stack .more {
+  margin-left: -9px;
+}
+
+.stackItem {
+  display: inline-flex;
+  border-radius: 999px;
+  box-shadow: 0 1px 3px rgb(35 38 47 / 0.18);
+}
+
+.more {
+  background: #23262f;
+  color: #f8e7c9;
+  font-size: 0.62rem;
+  position: relative;
+}

@@ -1,0 +1,63 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Character {
+  id           String        @id @default(uuid())
+  name         String
+  description  String
+  greeting     String
+  systemPrompt String
+  avatarUrl    String
+  tags         String        @default("")
+  gender       String        @default("Female")
+  visibility   String        @default("private") // "global" = public, "private" = owner-only
+  // Monolith user id of the creator (null = legacy seed character, treated as public).
+  creatorId    String?
+  personality  String?
+  scenario     String?
+  messageCount Int           @default(0)
+  createdAt    DateTime      @default(now())
+  sessions     ChatSession[]
+
+  @@index([creatorId])
+  @@index([visibility])
+}
+
+// Per-user plan + limits. isPremium is flipped by the upgrade endpoint
+// (admin key) once real billing lands in enterprise.
+model UserQuota {
+  userId    String   @id
+  isPremium Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ChatSession {
+  id          String    @id @default(uuid())
+  characterId String
+  character   Character @relation(fields: [characterId], references: [id])
+  // Monolith user id when the caller passes a verifiable JWT, else null
+  // (legacy anonymous sessions keep working).
+  userId      String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  messages    Message[]
+
+  @@index([userId])
+  @@index([characterId, userId])
+}
+
+model Message {
+  id            String      @id @default(uuid())
+  chatSessionId String
+  session       ChatSession @relation(fields: [chatSessionId], references: [id])
+  role          String      // "user" or "model" / "assistant"
+  content       String
+  createdAt     DateTime    @default(now())
+}

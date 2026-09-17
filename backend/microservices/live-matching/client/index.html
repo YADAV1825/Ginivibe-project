@@ -1,0 +1,1100 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <title>Video Call — Test Client</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <style>
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #13131a;
+            --bg-glass: rgba(255, 255, 255, 0.04);
+            --bg-glass-hover: rgba(255, 255, 255, 0.08);
+            --border: rgba(255, 255, 255, 0.08);
+            --border-active: rgba(139, 92, 246, 0.5);
+            --text-primary: #f0f0f5;
+            --text-secondary: #8b8b9e;
+            --text-muted: #555566;
+            --accent: #8b5cf6;
+            --accent-glow: rgba(139, 92, 246, 0.25);
+            --green: #22c55e;
+            --green-glow: rgba(34, 197, 94, 0.25);
+            --red: #ef4444;
+            --red-glow: rgba(239, 68, 68, 0.25);
+            --yellow: #eab308;
+            --radius: 16px;
+            --radius-sm: 10px;
+            --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            min-height: 100dvh;
+            overflow: hidden;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(ellipse at 30% 20%, rgba(139, 92, 246, 0.06) 0%, transparent 50%),
+                radial-gradient(ellipse at 70% 80%, rgba(59, 130, 246, 0.04) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .app {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            height: 100dvh;
+        }
+
+        /* ─── Header ─── */
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 20px;
+            border-bottom: 1px solid var(--border);
+            backdrop-filter: blur(20px);
+            background: rgba(10, 10, 15, 0.8);
+            flex-shrink: 0;
+        }
+
+        .header-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--accent), #6366f1);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .logo-text {
+            font-size: 16px;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status-badge {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            background: var(--bg-glass);
+            border: 1px solid var(--border);
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .status-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--text-muted);
+            transition: var(--transition);
+        }
+
+        .status-dot.connected {
+            background: var(--green);
+            box-shadow: 0 0 8px var(--green-glow);
+        }
+
+        .status-dot.searching {
+            background: var(--yellow);
+            box-shadow: 0 0 8px rgba(234, 179, 8, 0.3);
+            animation: pulse-dot 1s ease-in-out infinite;
+        }
+
+        .status-dot.in-call {
+            background: var(--green);
+            box-shadow: 0 0 8px var(--green-glow);
+        }
+
+        .status-dot.error {
+            background: var(--red);
+            box-shadow: 0 0 8px var(--red-glow);
+        }
+
+        @keyframes pulse-dot {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.4;
+            }
+        }
+
+        /* ─── Quality Indicator ─── */
+        .quality-badge {
+            display: none;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            border-radius: 16px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .quality-badge.visible {
+            display: flex;
+        }
+
+        .quality-badge.excellent {
+            background: rgba(34, 197, 94, 0.15);
+            color: var(--green);
+            border: 1px solid rgba(34, 197, 94, 0.2);
+        }
+
+        .quality-badge.good {
+            background: rgba(59, 130, 246, 0.15);
+            color: #3b82f6;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+
+        .quality-badge.poor {
+            background: rgba(234, 179, 8, 0.15);
+            color: var(--yellow);
+            border: 1px solid rgba(234, 179, 8, 0.2);
+        }
+
+        .quality-badge.critical {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--red);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        .quality-bars {
+            display: flex;
+            align-items: flex-end;
+            gap: 1.5px;
+            height: 12px;
+        }
+
+        .quality-bars .bar {
+            width: 3px;
+            border-radius: 1px;
+            background: currentColor;
+            opacity: 0.25;
+            transition: var(--transition);
+        }
+
+        .quality-bars .bar.active {
+            opacity: 1;
+        }
+
+        .quality-bars .bar:nth-child(1) {
+            height: 4px;
+        }
+
+        .quality-bars .bar:nth-child(2) {
+            height: 7px;
+        }
+
+        .quality-bars .bar:nth-child(3) {
+            height: 10px;
+        }
+
+        .quality-bars .bar:nth-child(4) {
+            height: 13px;
+        }
+
+        /* ─── Main ─── */
+        .main {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* ─── Lobby ─── */
+        .lobby {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 28px;
+            max-width: 420px;
+            width: 100%;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(16px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .lobby-preview {
+            position: relative;
+            width: 300px;
+            height: 225px;
+            border-radius: var(--radius);
+            overflow: hidden;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+        }
+
+        .lobby-preview video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scaleX(-1);
+        }
+
+        .lobby-preview-label {
+            position: absolute;
+            bottom: 8px;
+            left: 8px;
+            padding: 3px 8px;
+            border-radius: 6px;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .lobby-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 100%;
+        }
+
+        .btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 13px 22px;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            letter-spacing: -0.01em;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent), #6366f1);
+            color: white;
+            box-shadow: 0 4px 20px var(--accent-glow);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 30px var(--accent-glow);
+        }
+
+        .btn-primary:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: var(--bg-glass);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background: var(--bg-glass-hover);
+            border-color: var(--border-active);
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            width: 100%;
+            color: var(--text-muted);
+            font-size: 12px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        .room-input-group {
+            display: flex;
+            gap: 8px;
+            width: 100%;
+        }
+
+        .input {
+            flex: 1;
+            padding: 13px 14px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            background: var(--bg-glass);
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 500;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            outline: none;
+            transition: var(--transition);
+        }
+
+        .input::placeholder {
+            color: var(--text-muted);
+            letter-spacing: 0;
+            text-transform: none;
+        }
+
+        .input:focus {
+            border-color: var(--border-active);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+
+        /* ─── Call View ─── */
+        .call-view {
+            display: none;
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        .call-view.active {
+            display: flex;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .remote-video-container {
+            width: 100%;
+            height: 100%;
+            background: var(--bg-secondary);
+            border-radius: var(--radius);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .remote-video-container video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .remote-video-placeholder {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            color: var(--text-secondary);
+        }
+
+        .spinner {
+            width: 36px;
+            height: 36px;
+            border: 3px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .local-video-pip {
+            position: absolute;
+            bottom: 96px;
+            right: 16px;
+            width: 160px;
+            height: 120px;
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            border: 2px solid var(--border);
+            background: var(--bg-secondary);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            z-index: 10;
+            transition: box-shadow var(--transition);
+        }
+
+        .local-video-pip:hover {
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6);
+            border-color: var(--border-active);
+        }
+
+        .local-video-pip video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scaleX(-1);
+        }
+
+        /* ─── Call Controls ─── */
+        .call-controls {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            padding: 10px 18px;
+            border-radius: 24px;
+            background: rgba(19, 19, 26, 0.85);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            z-index: 20;
+        }
+
+        .control-btn {
+            width: 46px;
+            height: 46px;
+            border: none;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 17px;
+            background: var(--bg-glass);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .control-btn:hover {
+            background: var(--bg-glass-hover);
+            transform: scale(1.06);
+        }
+
+        .control-btn.active {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: rgba(239, 68, 68, 0.4);
+            color: var(--red);
+        }
+
+        .control-btn.end-call {
+            width: 54px;
+            height: 54px;
+            background: var(--red);
+            color: white;
+            border: none;
+            font-size: 19px;
+        }
+
+        .control-btn.end-call:hover {
+            background: #dc2626;
+            box-shadow: 0 4px 20px var(--red-glow);
+        }
+
+        .room-code-display {
+            position: absolute;
+            top: 16px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 6px 14px;
+            border-radius: 12px;
+            background: rgba(19, 19, 26, 0.85);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            z-index: 20;
+            display: none;
+            white-space: nowrap;
+        }
+
+        .room-code-display span {
+            color: var(--accent);
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            margin-left: 4px;
+            cursor: pointer;
+        }
+
+        .call-timer {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            padding: 5px 12px;
+            border-radius: 10px;
+            background: rgba(19, 19, 26, 0.85);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            font-variant-numeric: tabular-nums;
+            z-index: 20;
+            display: none;
+        }
+
+        /* ─── Network Warning Banner ─── */
+        .network-banner {
+            display: none;
+            position: absolute;
+            top: 56px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 6px 14px;
+            border-radius: 10px;
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--red);
+            z-index: 20;
+            white-space: nowrap;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .network-banner.visible {
+            display: block;
+        }
+
+        /* ─── Searching Overlay ─── */
+        .searching-overlay {
+            display: none;
+            position: absolute;
+            inset: 0;
+            background: rgba(10, 10, 15, 0.92);
+            backdrop-filter: blur(10px);
+            z-index: 50;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            border-radius: var(--radius);
+        }
+
+        .searching-overlay.active {
+            display: flex;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .searching-text {
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .searching-subtext {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        /* ─── Toast ─── */
+        .toast-container {
+            position: fixed;
+            top: 64px;
+            right: 16px;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .toast {
+            padding: 10px 16px;
+            border-radius: var(--radius-sm);
+            background: rgba(19, 19, 26, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-primary);
+            animation: slideIn 0.3s ease-out;
+            max-width: 300px;
+        }
+
+        .toast.error {
+            border-color: rgba(239, 68, 68, 0.3);
+            color: var(--red);
+        }
+
+        .toast.success {
+            border-color: rgba(34, 197, 94, 0.3);
+            color: var(--green);
+        }
+
+        .toast.warning {
+            border-color: rgba(234, 179, 8, 0.3);
+            color: var(--yellow);
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(16px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* ─── Responsive ─── */
+        @media (max-width: 640px) {
+            .main {
+                padding: 10px;
+            }
+
+            .lobby-preview {
+                width: 100%;
+                height: 200px;
+            }
+
+            .local-video-pip {
+                width: 110px;
+                height: 83px;
+                bottom: 84px;
+                right: 10px;
+            }
+
+            .call-controls {
+                bottom: 14px;
+                padding: 8px 14px;
+                gap: 8px;
+            }
+
+            .control-btn {
+                width: 42px;
+                height: 42px;
+                font-size: 15px;
+            }
+
+            .control-btn.end-call {
+                width: 48px;
+                height: 48px;
+            }
+
+            .logo-text {
+                display: none;
+            }
+
+            .header {
+                padding: 10px 14px;
+            }
+        }
+
+        @media (max-height: 500px) {
+            .lobby-preview {
+                height: 140px;
+            }
+
+            .lobby {
+                gap: 12px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app">
+        <header class="header">
+            <div class="header-logo">
+                <div class="logo-icon">📹</div>
+                <div class="logo-text">VideoCall</div>
+            </div>
+            <div class="header-right">
+                <div class="quality-badge" id="qualityBadge">
+                    <div class="quality-bars">
+                        <div class="bar" id="qBar1"></div>
+                        <div class="bar" id="qBar2"></div>
+                        <div class="bar" id="qBar3"></div>
+                        <div class="bar" id="qBar4"></div>
+                    </div>
+                    <span id="qualityLabel"></span>
+                </div>
+                <div class="status-badge">
+                    <div class="status-dot" id="statusDot"></div>
+                    <span id="statusText">Connecting...</span>
+                </div>
+            </div>
+        </header>
+
+        <main class="main">
+            <div class="lobby" id="lobby">
+                <div class="lobby-preview">
+                    <video id="lobbyVideo" autoplay muted playsinline></video>
+                    <div class="lobby-preview-label">Your camera</div>
+                </div>
+                <div class="lobby-actions">
+                    <button class="btn btn-primary" id="findMatchBtn" disabled>
+                        <span>🔍</span> Find a Match
+                    </button>
+                    <div class="divider">or join with a code</div>
+                    <div class="room-input-group">
+                        <input class="input" id="roomCodeInput" type="text" placeholder="Enter room code" maxlength="6"
+                            autocomplete="off" />
+                        <button class="btn btn-secondary" id="joinRoomBtn" disabled>Join</button>
+                    </div>
+                    <button class="btn btn-secondary" id="createRoomBtn" disabled>
+                        <span>➕</span> Create a Room
+                    </button>
+                </div>
+            </div>
+
+            <div class="call-view" id="callView">
+                <div class="remote-video-container">
+                    <video id="remoteVideo" autoplay playsinline></video>
+                    <div class="remote-video-placeholder" id="remotePlaceholder">
+                        <div class="spinner"></div>
+                        <div class="searching-text">Connecting to peer...</div>
+                    </div>
+                </div>
+
+                <div class="local-video-pip">
+                    <video id="localVideoPip" autoplay muted playsinline></video>
+                </div>
+
+                <div class="room-code-display" id="roomCodeDisplay">
+                    Room: <span id="roomCodeValue" title="Click to copy"></span>
+                </div>
+
+                <div class="call-timer" id="callTimer">00:00</div>
+                <div class="network-banner" id="networkBanner">⚠ Poor connection — reducing video quality</div>
+
+                <div class="call-controls">
+                    <button class="control-btn" id="toggleAudioBtn" title="Toggle Microphone">🎤</button>
+                    <button class="control-btn" id="toggleVideoBtn" title="Toggle Camera">📷</button>
+                    <button class="control-btn" id="switchCameraBtn" title="Switch Camera"
+                        style="display:none;">🔄</button>
+                    <button class="control-btn end-call" id="endCallBtn" title="End Call">📞</button>
+                </div>
+
+                <div class="searching-overlay" id="searchingOverlay">
+                    <div class="spinner"></div>
+                    <div class="searching-text">Searching for someone...</div>
+                    <div class="searching-subtext">You'll be matched with the next available person</div>
+                    <button class="btn btn-secondary" id="cancelSearchBtn" style="margin-top:8px;">Cancel</button>
+                </div>
+            </div>
+        </main>
+
+        <div class="toast-container" id="toastContainer"></div>
+    </div>
+
+    <script src="VideoCallClient.js"></script>
+    <script>
+        // ─── DOM ───────────────────────────────────────────────────
+        const $ = (id) => document.getElementById(id);
+        const lobby = $('lobby');
+        const callView = $('callView');
+        const lobbyVideo = $('lobbyVideo');
+        const remoteVideo = $('remoteVideo');
+        const localVideoPip = $('localVideoPip');
+        const remotePlaceholder = $('remotePlaceholder');
+        const statusDot = $('statusDot');
+        const statusText = $('statusText');
+        const findMatchBtn = $('findMatchBtn');
+        const joinRoomBtn = $('joinRoomBtn');
+        const createRoomBtn = $('createRoomBtn');
+        const roomCodeInput = $('roomCodeInput');
+        const toggleAudioBtn = $('toggleAudioBtn');
+        const toggleVideoBtn = $('toggleVideoBtn');
+        const switchCameraBtn = $('switchCameraBtn');
+        const endCallBtn = $('endCallBtn');
+        const roomCodeDisplay = $('roomCodeDisplay');
+        const roomCodeValue = $('roomCodeValue');
+        const callTimer = $('callTimer');
+        const searchingOverlay = $('searchingOverlay');
+        const cancelSearchBtn = $('cancelSearchBtn');
+        const toastContainer = $('toastContainer');
+        const qualityBadge = $('qualityBadge');
+        const qualityLabel = $('qualityLabel');
+        const networkBanner = $('networkBanner');
+
+        // ─── State ─────────────────────────────────────────────────
+        let callStartTime = null;
+        let callTimerInterval = null;
+        let audioMuted = false;
+        let videoOff = false;
+
+        // Detect mobile for camera switch button
+        const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+        if (isMobile) switchCameraBtn.style.display = 'flex';
+
+        // ─── Server URL ────────────────────────────────────────────
+        const wsProtocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const serverUrl = `${wsProtocol}//${location.hostname}:${location.port || 8080}`;
+
+        const client = new VideoCallClient(serverUrl);
+
+        // ─── Helpers ───────────────────────────────────────────────
+        function showToast(message, type = 'info') {
+            const t = document.createElement('div');
+            t.className = `toast ${type}`;
+            t.textContent = message;
+            toastContainer.appendChild(t);
+            setTimeout(() => {
+                t.style.opacity = '0';
+                t.style.transform = 'translateX(16px)';
+                t.style.transition = '0.3s ease';
+                setTimeout(() => t.remove(), 300);
+            }, 3500);
+        }
+
+        function setStatus(state, text) {
+            statusDot.className = `status-dot ${state}`;
+            statusText.textContent = text;
+        }
+
+        function showLobby() {
+            lobby.style.display = 'flex';
+            callView.classList.remove('active');
+            searchingOverlay.classList.remove('active');
+            roomCodeDisplay.style.display = 'none';
+            callTimer.style.display = 'none';
+            networkBanner.classList.remove('visible');
+            qualityBadge.classList.remove('visible');
+            stopCallTimer();
+            if (client.localStream) lobbyVideo.srcObject = client.localStream;
+        }
+
+        function showCallView() {
+            lobby.style.display = 'none';
+            callView.classList.add('active');
+            searchingOverlay.classList.remove('active');
+            if (client.localStream) localVideoPip.srcObject = client.localStream;
+        }
+
+        function showSearching() {
+            lobby.style.display = 'none';
+            callView.classList.add('active');
+            searchingOverlay.classList.add('active');
+        }
+
+        function startCallTimer() {
+            callStartTime = Date.now();
+            callTimer.style.display = 'block';
+            callTimerInterval = setInterval(() => {
+                const s = Math.floor((Date.now() - callStartTime) / 1000);
+                callTimer.textContent = `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
+            }, 1000);
+        }
+
+        function stopCallTimer() {
+            if (callTimerInterval) { clearInterval(callTimerInterval); callTimerInterval = null; }
+            callStartTime = null;
+        }
+
+        function enableButtons() {
+            findMatchBtn.disabled = false;
+            joinRoomBtn.disabled = false;
+            createRoomBtn.disabled = false;
+        }
+
+        function resetCallState() {
+            setStatus('connected', 'Connected');
+            showLobby();
+            remoteVideo.srcObject = null;
+            audioMuted = false;
+            videoOff = false;
+            toggleAudioBtn.classList.remove('active');
+            toggleAudioBtn.textContent = '🎤';
+            toggleVideoBtn.classList.remove('active');
+            toggleVideoBtn.textContent = '📷';
+        }
+
+        function updateQualityUI(data) {
+            qualityBadge.classList.add('visible');
+            qualityBadge.className = `quality-badge visible ${data.quality}`;
+            qualityLabel.textContent = `${data.bitrate}k`;
+
+            const bars = [$('qBar1'), $('qBar2'), $('qBar3'), $('qBar4')];
+            const activeBars = { excellent: 4, good: 3, poor: 2, critical: 1 };
+            const count = activeBars[data.quality] || 0;
+            bars.forEach((bar, i) => bar.classList.toggle('active', i < count));
+
+            // Show/hide network warning
+            networkBanner.classList.toggle('visible', data.quality === 'poor' || data.quality === 'critical');
+        }
+
+        // ─── Client Events ─────────────────────────────────────────
+        client
+            .on('welcome', () => { setStatus('connected', 'Connected'); enableButtons(); })
+            .on('connected', () => setStatus('connected', 'Connected'))
+            .on('disconnected', () => {
+                setStatus('error', 'Disconnected');
+                findMatchBtn.disabled = true;
+                joinRoomBtn.disabled = true;
+                createRoomBtn.disabled = true;
+            })
+            .on('reconnecting', ({ attempt }) => setStatus('', `Reconnecting (${attempt})...`))
+            .on('searching', () => { setStatus('searching', 'Searching...'); showSearching(); })
+            .on('searchCancelled', () => { setStatus('connected', 'Connected'); showLobby(); })
+            .on('queueJoined', ({ position }) => showToast(`In queue — position ${position}`))
+            .on('matched', ({ roomCode }) => {
+                setStatus('in-call', 'In Call');
+                showCallView();
+                roomCodeValue.textContent = roomCode;
+                roomCodeDisplay.style.display = 'block';
+                remotePlaceholder.style.display = 'flex';
+                showToast('Matched! Connecting...', 'success');
+            })
+            .on('roomCreated', ({ roomCode }) => {
+                showToast(`Room: ${roomCode} — share this code!`, 'success');
+                showCallView();
+                roomCodeValue.textContent = roomCode;
+                roomCodeDisplay.style.display = 'block';
+                remotePlaceholder.style.display = 'flex';
+                setStatus('searching', 'Waiting for peer...');
+                if (client.localStream) localVideoPip.srcObject = client.localStream;
+            })
+            .on('roomJoined', ({ roomCode }) => {
+                showToast('Joined — waiting for peer...', 'success');
+                showCallView();
+                roomCodeValue.textContent = roomCode;
+                roomCodeDisplay.style.display = 'block';
+                remotePlaceholder.style.display = 'flex';
+                setStatus('searching', 'Waiting...');
+                if (client.localStream) localVideoPip.srcObject = client.localStream;
+            })
+            .on('remoteStream', (stream) => {
+                remoteVideo.srcObject = stream;
+                remotePlaceholder.style.display = 'none';
+            })
+            .on('callStarted', () => {
+                setStatus('in-call', 'In Call');
+                startCallTimer();
+                showToast('Call connected!', 'success');
+            })
+            .on('callEnded', () => resetCallState())
+            .on('peerDisconnected', ({ reason }) => {
+                resetCallState();
+                showToast(reason === 'call-ended' ? 'Peer ended the call' : 'Peer disconnected');
+            })
+            .on('callInterrupted', () => showToast('Connection interrupted — reconnecting...', 'warning'))
+            .on('iceRestarting', () => showToast('Recovering connection...', 'warning'))
+            .on('callFailed', () => showToast('Call failed. Please try again.', 'error'))
+            .on('qualityUpdate', updateQualityUI)
+            .on('qualityChanged', ({ from, to }) => {
+                if (to === 'poor') showToast('Connection quality is poor', 'warning');
+                else if (to === 'critical') showToast('Very poor connection — audio only recommended', 'error');
+            })
+            .on('networkChanged', ({ type }) => showToast(`Network changed to ${type}`, 'warning'))
+            .on('networkOffline', () => showToast('You are offline', 'error'))
+            .on('networkOnline', () => showToast('Back online — reconnecting...', 'success'))
+            .on('warning', ({ message }) => showToast(message, 'warning'))
+            .on('error', ({ message }) => showToast(message || 'An error occurred', 'error'));
+
+        // ─── Button Handlers ───────────────────────────────────────
+        findMatchBtn.addEventListener('click', () => client.findMatch());
+        cancelSearchBtn.addEventListener('click', () => { client.cancelSearch(); setStatus('connected', 'Connected'); showLobby(); });
+        createRoomBtn.addEventListener('click', () => client.createRoom());
+        joinRoomBtn.addEventListener('click', () => {
+            const code = roomCodeInput.value.trim();
+            if (!code) { showToast('Enter a room code', 'error'); return; }
+            client.joinRoom(code);
+        });
+        roomCodeInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') joinRoomBtn.click(); });
+        toggleAudioBtn.addEventListener('click', () => {
+            audioMuted = client.toggleAudio();
+            toggleAudioBtn.classList.toggle('active', audioMuted);
+            toggleAudioBtn.textContent = audioMuted ? '🔇' : '🎤';
+        });
+        toggleVideoBtn.addEventListener('click', () => {
+            videoOff = client.toggleVideo();
+            toggleVideoBtn.classList.toggle('active', videoOff);
+            toggleVideoBtn.textContent = videoOff ? '🚫' : '📷';
+        });
+        switchCameraBtn.addEventListener('click', () => client.switchCamera());
+        endCallBtn.addEventListener('click', () => client.endCall());
+
+        // Copy room code on click
+        roomCodeValue.addEventListener('click', () => {
+            navigator.clipboard?.writeText(roomCodeValue.textContent).then(() => {
+                showToast('Room code copied!', 'success');
+            });
+        });
+
+        // ─── Init ──────────────────────────────────────────────────
+        async function init() {
+            try {
+                await client.start();
+                lobbyVideo.srcObject = client.localStream;
+                await client.connect();
+            } catch (err) {
+                console.error('Init error:', err);
+                showToast('Could not access camera or connect', 'error');
+                // Still try to connect even without camera
+                try { await client.connect(); enableButtons(); } catch (e) { }
+            }
+        }
+
+        init();
+    </script>
+</body>
+
+</html>

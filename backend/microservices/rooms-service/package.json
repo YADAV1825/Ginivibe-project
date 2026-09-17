@@ -1,0 +1,40 @@
+{
+    "name": "@ginivibe/rooms-service",
+    "version": "1.0.0",
+    "private": true,
+    "type": "commonjs",
+    "scripts": {
+        "dev": "tsx watch src/server.ts",
+        "build": "npm run prisma:generate && tsc",
+        "start": "node dist/server.js",
+        "prisma:generate": "prisma generate --config prisma.config.ts",
+        "prisma:migrate": "prisma migrate dev --config prisma.config.ts",
+        "prisma:status": "prisma migrate status --config prisma.config.ts",
+        "prisma:deploy": "prisma migrate deploy --config prisma.config.ts"
+    },
+    "dependencies": {
+        "@livekit/protocol": "^1.26.1",
+        "@prisma/adapter-pg": "^7.9.1",
+        "@prisma/client": "^7.9.1",
+        "bcryptjs": "^3.0.3",
+        "cors": "^2.8.6",
+        "dotenv": "^17.4.2",
+        "express": "^5.2.1",
+        "jsonwebtoken": "^9.0.3",
+        "livekit-server-sdk": "^2.7.2",
+        "pg": "^8.23.0",
+        "socket.io": "^4.8.3"
+    },
+    "devDependencies": {
+        "@faker-js/faker": "^10.6.0",
+        "@types/bcryptjs": "^2.4.6",
+        "@types/cors": "^2.8.19",
+        "@types/express": "^5.0.6",
+        "@types/jsonwebtoken": "^9.0.10",
+        "@types/node": "^26.2.0",
+        "@types/pg": "^8.23.1",
+        "prisma": "^7.9.1",
+        "tsx": "^4.23.12",
+        "typescript": "^7.0.2"
+    }
+}

@@ -1,0 +1,101 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/client"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum EventMode {
+  ONLINE
+  OFFLINE
+}
+
+enum EventRSVPStatus {
+  INTERESTED
+  GOING
+  DECLINED
+}
+
+model Event {
+  id             String   @id @default(uuid())
+  title          String
+  description    String?
+
+  // ID of the user from the Monolithic/Auth service.
+  // No User relation because Users live in the monolithic database.
+  organizerId    String
+
+  startAt        DateTime
+  endAt          DateTime
+
+  mode           EventMode
+
+  // Online event
+  meetingUrl     String?
+  platform       String?
+
+  // How to join: meeting / group / location link (both modes).
+  joinUrl        String?
+
+  // Offline event
+  venue          String?
+  location       String?
+
+  capacity       Int?
+  bannerImageUrl String?
+
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  attendees      EventAttendee[]
+  waitlist       EventWaitlist[]
+  interests      EventInterest[]
+
+  @@index([organizerId])
+  @@index([startAt])
+  @@index([endAt])
+  @@index([mode])
+}
+
+model EventAttendee {
+  id         String          @id @default(uuid())
+  eventId    String
+  userId     String
+  rsvpStatus EventRSVPStatus
+  joinedAt   DateTime        @default(now())
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@unique([eventId, userId])
+  @@index([userId])
+  @@index([eventId, rsvpStatus])
+}
+
+model EventWaitlist {
+  id        String   @id @default(uuid())
+  eventId   String
+  userId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@unique([eventId, userId])
+  @@index([userId])
+  @@index([eventId, createdAt, id])
+}
+
+model EventInterest {
+  eventId       String
+  subInterestId String
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  // subInterestId belongs to the Monolithic/Auth database.
+  // There is intentionally no SubInterest relation here.
+
+  @@id([eventId, subInterestId])
+  @@index([subInterestId])
+}

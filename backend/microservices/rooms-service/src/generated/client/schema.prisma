@@ -1,0 +1,101 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/client"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum RoomType {
+  TEXT
+  VOICE
+  VIDEO
+}
+
+enum RoomVisibility {
+  OPEN
+  PRIVATE
+}
+
+enum RoomParticipantRole {
+  CREATOR
+  MEMBER
+}
+
+model Room {
+  id   String @id @default(uuid())
+  name String
+
+  // ID of the user from the Monolithic/Auth service.
+  // No User relation because Users live in the monolithic database.
+  creatorId String
+
+  type       RoomType
+  visibility RoomVisibility @default(OPEN)
+
+  // bcrypt hash of the room PIN — only set when visibility = PRIVATE.
+  // Enforced by the chk_private_room_has_code CHECK constraint added in
+  // the initial migration (Prisma's schema DSL can't express cross-field
+  // CHECK constraints, so it's hand-added there).
+  accessCodeHash String?
+
+  // Hard cap enforced both here (default) and at the DB level via a
+  // CHECK constraint (max 30) added in the initial migration.
+  maxCapacity Int @default(30)
+
+  isActive Boolean @default(true)
+
+  // When the room last became empty (zero active participants). Cleared on
+  // every join. The sweeper deactivates rooms that stay empty for 10 minutes.
+  emptiedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  participants RoomParticipant[]
+  messages     RoomMessage[] // <-- Required opposite relation field
+
+  @@index([isActive])
+  @@index([isActive, type])
+}
+
+model RoomParticipant {
+  id     String @id @default(uuid())
+  roomId String
+  room   Room   @relation(fields: [roomId], references: [id], onDelete: Cascade)
+
+  // ID of the user from the Monolithic/Auth service — no relation, same
+  // reasoning as Room.creatorId above.
+  userId String
+
+  role RoomParticipantRole @default(MEMBER)
+
+  joinedAt DateTime  @default(now())
+  leftAt   DateTime?
+
+  // NOTE: "unique while active" (a user can only have ONE active — i.e.
+  // leftAt IS NULL — participation row per room, but MAY rejoin after
+  // leaving) cannot be expressed as a plain Prisma @@unique, because
+  // Postgres treats every NULL as distinct in a unique constraint, so a
+  // plain UNIQUE(roomId, userId) would either block rejoining (if leftAt
+  // isn't part of the key) or fail to prevent duplicate *active* rows (if
+  // it is). The initial migration therefore hand-adds a partial unique
+  // index instead:
+  //   CREATE UNIQUE INDEX uq_room_participants_active
+  //     ON "RoomParticipant" ("roomId", "userId") WHERE "leftAt" IS NULL;
+  @@index([roomId, leftAt])
+  @@index([userId])
+}
+
+model RoomMessage {
+  id        String   @id @default(uuid())
+  roomId    String
+  room      Room     @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  userId    String
+  username  String
+  text      String
+  createdAt DateTime @default(now())
+
+  @@index([roomId, createdAt])
+}

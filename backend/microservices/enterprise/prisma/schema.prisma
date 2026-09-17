@@ -1,0 +1,408 @@
+generator client {
+  provider      = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id         String   @id @default(uuid())
+  username   String   @unique
+  email      String   @unique
+  password   String
+  firstName  String?
+  lastName   String?
+  dob        String?
+  gender     String?
+  bio        String?
+  profilePic String?
+  zodiacSign String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  interests   UserInterest[]
+  preferences MatchPreference?
+
+  followers Follow[] @relation("UserFollowers")
+  following Follow[] @relation("UserFollowing")
+
+  blockedUsers Block[] @relation("UserBlocker")
+  blockedBy    Block[] @relation("UserBlocked")
+
+  seenCandidates SeenCandidate[] @relation("UserSeen")
+  seenBy         SeenCandidate[] @relation("CandidateSeen")
+
+  callRequestsSent     CallRequest[] @relation("CallRequestCaller")
+  callRequestsReceived CallRequest[] @relation("CallRequestReceiver")
+
+  callSessionsAsCaller   CallSession[] @relation("CallSessionCaller")
+  callSessionsAsReceiver CallSession[] @relation("CallSessionReceiver")
+
+  adImpressions AdImpression[]
+  adClicks      AdClick[]
+}
+
+model Interest {
+  id   String  @id @default(uuid())
+  name String  @unique
+  icon String?
+
+  subInterests SubInterest[]
+}
+
+model SubInterest {
+  id         String   @id @default(uuid())
+  name       String
+  interestId String
+  interest   Interest @relation(fields: [interestId], references: [id])
+
+  users UserInterest[]
+
+  @@unique([name, interestId])
+}
+
+model UserInterest {
+  userId        String
+  subInterestId String
+
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subInterest SubInterest @relation(fields: [subInterestId], references: [id], onDelete: Cascade)
+
+  @@id([userId, subInterestId])
+}
+
+model Follow {
+  id          String   @id @default(uuid())
+  followerId  String
+  followingId String
+  status      String   @default("PENDING") // PENDING, ACCEPTED, REJECTED
+  message     String?  @db.VarChar(500)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  follower  User @relation("UserFollowing", fields: [followerId], references: [id], onDelete: Cascade)
+  following User @relation("UserFollowers", fields: [followingId], references: [id], onDelete: Cascade)
+
+  @@unique([followerId, followingId])
+}
+
+model Block {
+  id        String   @id @default(uuid())
+  blockerId String
+  blockedId String
+  createdAt DateTime @default(now())
+
+  blocker User @relation("UserBlocker", fields: [blockerId], references: [id], onDelete: Cascade)
+  blocked User @relation("UserBlocked", fields: [blockedId], references: [id], onDelete: Cascade)
+
+  @@unique([blockerId, blockedId])
+}
+
+model MatchPreference {
+  id              String   @id @default(uuid())
+  userId          String   @unique
+  preferredGender String?
+  minAge          Int      @default(18)
+  maxAge          Int      @default(99)
+  maxDistance     Int?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model SeenCandidate {
+  id          String   @id @default(uuid())
+  userId      String
+  candidateId String
+  createdAt   DateTime @default(now())
+
+  user      User @relation("UserSeen", fields: [userId], references: [id], onDelete: Cascade)
+  candidate User @relation("CandidateSeen", fields: [candidateId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, candidateId])
+}
+
+enum CallRequestStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  EXPIRED
+  CANCELLED
+}
+
+model CallRequest {
+  id          String            @id @default(uuid())
+  callerId    String
+  receiverId  String
+  status      CallRequestStatus @default(PENDING)
+  createdAt   DateTime          @default(now())
+  expiresAt   DateTime
+  respondedAt DateTime?
+
+  caller   User @relation("CallRequestCaller", fields: [callerId], references: [id], onDelete: Cascade)
+  receiver User @relation("CallRequestReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
+
+  @@index([receiverId, status])
+  @@index([callerId, status])
+  @@index([expiresAt])
+}
+
+enum CallSessionStatus {
+  CREATED
+  CONNECTING
+  ACTIVE
+  ENDED
+  FAILED
+}
+
+model CallSession {
+  id            String            @id @default(uuid())
+  callRequestId String            @unique
+  callerId      String
+  receiverId    String
+  roomCode      String            @unique
+  status        CallSessionStatus @default(CREATED)
+  createdAt     DateTime          @default(now())
+  startedAt     DateTime?
+  endedAt       DateTime?
+
+  caller   User @relation("CallSessionCaller", fields: [callerId], references: [id], onDelete: Cascade)
+  receiver User @relation("CallSessionReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
+}
+
+// -----------------------------------------------------
+// ENTERPRISE PLATFORM MODELS
+// -----------------------------------------------------
+
+model EnterpriseUser {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  firstName String?
+  lastName  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  memberships OrganizationMember[]
+}
+
+enum OrganizationStatus {
+  ACTIVE
+  SUSPENDED
+}
+
+model Organization {
+  id        String             @id @default(uuid())
+  name      String
+  status    OrganizationStatus @default(ACTIVE)
+  createdAt DateTime           @default(now())
+  updatedAt DateTime           @updatedAt
+
+  members    OrganizationMember[]
+  campaigns  Campaign[]
+  creatives  Creative[]
+  billing    BillingProfile?
+}
+
+// -----------------------------------------------------
+// PLATFORM ADMINISTRATION MODELS (SUPER-ADMIN)
+// -----------------------------------------------------
+
+enum PlatformRole {
+  SUPER_ADMIN
+  PLATFORM_ADMIN
+  REVIEWER
+  SUPPORT
+}
+
+model AdminUser {
+  id        String       @id @default(uuid())
+  email     String       @unique
+  password  String
+  firstName String?
+  lastName  String?
+  role      PlatformRole @default(REVIEWER)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  auditLogs AdminAuditLog[]
+}
+
+model AdminAuditLog {
+  id             String   @id @default(uuid())
+  adminId        String
+  action         String
+  resourceType   String
+  resourceId     String
+  organizationId String?
+  metadata       Json?
+  ipAddress      String?
+  userAgent      String?
+  createdAt      DateTime @default(now())
+
+  admin AdminUser @relation(fields: [adminId], references: [id])
+}
+
+// Ensure other models are untouched (just making sure the file completes gracefully)
+enum EnterpriseRole {
+  OWNER
+  ADMIN
+  CAMPAIGN_MANAGER
+  ANALYST
+  VIEWER
+}
+
+model OrganizationMember {
+  id             String         @id @default(uuid())
+  organizationId String
+  userId         String
+  role           EnterpriseRole @default(VIEWER)
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  organization Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user         EnterpriseUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, userId])
+}
+
+enum CampaignStatus {
+  DRAFT
+  PENDING_REVIEW
+  ACTIVE
+  PAUSED
+  COMPLETED
+  CANCELLED
+  REJECTED
+}
+
+model Campaign {
+  id             String         @id @default(uuid())
+  organizationId String
+  name           String
+  objective      String?
+  status         CampaignStatus @default(DRAFT)
+  budget         Decimal        @db.Decimal(10, 2)
+  startDate      DateTime
+  endDate        DateTime?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  organization Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  ads          Advertisement[]
+  targeting    TargetingRule?
+}
+
+enum AdStatus {
+  DRAFT
+  PENDING_REVIEW
+  APPROVED
+  REJECTED
+  ACTIVE
+  PAUSED
+}
+
+model Advertisement {
+  id             String   @id @default(uuid())
+  campaignId     String
+  creativeId     String
+  name           String
+  status         AdStatus @default(DRAFT)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  campaign Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  creative Creative @relation(fields: [creativeId], references: [id])
+  
+  impressions AdImpression[]
+  clicks      AdClick[]
+  placements  AdPlacement[]
+}
+
+enum MediaType {
+  IMAGE
+  VIDEO
+}
+
+model Creative {
+  id             String    @id @default(uuid())
+  organizationId String
+  name           String
+  mediaType      MediaType
+  storageKey     String
+  headline       String?
+  description    String?
+  ctaText        String?
+  destinationUrl String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  organization Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  ads          Advertisement[]
+}
+
+model TargetingRule {
+  id         String   @id @default(uuid())
+  campaignId String   @unique
+  minAge     Int?
+  maxAge     Int?
+  locations  String[]
+  interests  String[]
+  genders    String[]
+  devices    String[]
+  
+  campaign Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+}
+
+enum PlacementType {
+  FEED
+  EXPLORE
+  MATCHING
+}
+
+model AdPlacement {
+  id              String        @id @default(uuid())
+  advertisementId String
+  placementType   PlacementType
+
+  advertisement Advertisement @relation(fields: [advertisementId], references: [id], onDelete: Cascade)
+  
+  @@unique([advertisementId, placementType])
+}
+
+model AdImpression {
+  id              String   @id @default(uuid())
+  advertisementId String
+  userId          String?
+  placementType   PlacementType
+  impressionCost  Decimal  @db.Decimal(10, 4)
+  createdAt       DateTime @default(now())
+
+  advertisement Advertisement @relation(fields: [advertisementId], references: [id], onDelete: Cascade)
+  user          User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
+}
+
+model AdClick {
+  id              String   @id @default(uuid())
+  advertisementId String
+  userId          String?
+  placementType   PlacementType
+  clickCost       Decimal  @db.Decimal(10, 4)
+  createdAt       DateTime @default(now())
+
+  advertisement Advertisement @relation(fields: [advertisementId], references: [id], onDelete: Cascade)
+  user          User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
+}
+
+model BillingProfile {
+  id             String   @id @default(uuid())
+  organizationId String   @unique
+  balance        Decimal  @default(0.00) @db.Decimal(10, 2)
+  currency       String   @default("INR")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+}
