@@ -1,233 +1,83 @@
-# ✨ GiniVibe-Project
+# GiniVibe-Project
 
-> **A production-grade, full-stack social media universe — Web + Android + iOS from a single monorepo.**
+A production-grade social media platform — responsive web app plus native Android and iOS apps, all served from a single monorepo.
 
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Next.js](https://img.shields.io/badge/Next.js-16-black?logo=next.js)](https://nextjs.org/)
 [![Expo](https://img.shields.io/badge/Expo-57-000020?logo=expo&logoColor=white)](https://expo.dev/)
-[![React Native](https://img.shields.io/badge/React_Native-0.86-61DAFB?logo=react&logoColor=black)](https://reactnative.dev/)
-[![Node.js](https://img.shields.io/badge/Node.js-20+-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
-[![Prisma](https://img.shields.io/badge/Prisma-ORM-2D3748?logo=prisma&logoColor=white)](https://www.prisma.io/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
-[![WebRTC](https://img.shields.io/badge/WebRTC-Live_Video-333333)](https://webrtc.org/)
-[![Socket.io](https://img.shields.io/badge/Socket.io-Realtime-010101?logo=socket.io&logoColor=white)](https://socket.io/)
 [![License](https://img.shields.io/badge/License-Proprietary-red)](./frontend-app/LICENSE)
 
-**GiniVibe-Project** is not a demo, not a tutorial clone, and not a Figma mockup with a login button.
-It is a **real, working, production-grade social media platform** with a live feed, real-time chat,
-online/offline events, group rooms, AI characters, astrology insights, and intelligent matching —
-served through **two first-class clients**:
+## Demo
 
-| Client | Stack | Runs on |
-|---|---|---|
-| 🌐 **Web app** (fully responsive, mobile-friendly) | Next.js 16 App Router, React 19, Tailwind CSS 4 | Desktop + mobile browsers |
-| 📱 **Native mobile app** | Expo 57 + React Native + expo-router | Android + iOS (+ web via Expo) |
+[![Watch the GiniVibe demo](images/demo-thumbnail.png)](https://youtu.be/JZLE3S9hWN8)
 
-One backend family. One PostgreSQL source of truth. Two polished frontends. Zero shortcuts.
+Click the preview above to watch the product walkthrough on YouTube.
 
-> 📌 **Repo note:** this public showcase repo is called **`Ginivibe-project`**
-> (a separate private `Ginivibe` repo also exists — this one is the public face).
+## Overview
 
----
+GiniVibe is a social discovery and community platform that brings together a multimedia feed, private messaging, online and offline events, group rooms, AI characters, astrology-based self-insight, and intelligent matching — in one cohesive product.
 
-## 🎬 Demo Video — click to watch
+It is built as a service-oriented monorepo: a core API covering identity, feed, chat, presence, and search, plus focused microservices for events, matching, rooms, AI, astrology, and an enterprise ad network. PostgreSQL is the single source of truth across all of them, managed through Prisma and provisioned locally with Docker Compose.
 
-<!-- Verified: GitHub strips ALL <video> tags in READMEs, so the thumbnail below
-     links to the mp4's GitHub file page, which renders its own video player. -->
-[![▶ Watch the GiniVibe Demo — click to play](images/demo-thumbnail.png)](./recording_20260915_14-09-15.mp4)
+There are two first-class clients:
 
-> 👆 **Click the preview above** — it opens the video's GitHub page with a built-in player. 👆
-> File: [`recording_20260915_14-09-15.mp4`](./recording_20260915_14-09-15.mp4)
-> (Not the Android-specific video — this is the main product walkthrough.)
+- **Web** (`frontend-web/`) — Next.js 16 App Router dashboard, fully responsive down to phone widths.
+- **Mobile** (`frontend-app/`) — Expo 57 + React Native app running on Android and iOS, with feature parity against the web client.
 
-<details>
-<summary><b>🎥 How is this video embedded? (verified facts — click to expand)</b></summary>
+## Features
 
-<br>
+**Feed.** Chronological multimedia stream (text, images, video) with All / Images / Videos / Communities tabs, optimistic likes, threaded comments with ownership rules, native share, deduplicated view counts, community tagging, post creation with media upload, and natively injected sponsored placements from the built-in ad server.
 
-**What works today (active): clickable thumbnail → GitHub's own video player ✅**
-- The mp4 (`~43 MB`) is committed to this repo, and `images/demo-thumbnail.png`
-  (a real frame pulled from the video with ffmpeg) is the preview image.
-- Clicking it opens the file's GitHub page, which renders a **native player** — one click to watch.
-- ⚠️ Do **not** use `<video>` tags in a README: GitHub's sanitizer strips them completely
-  (verified against the rendered page HTML — the tag vanishes, relative *or* absolute URL).
-- ⚠️ Release-asset URLs (`releases/download/…`) serve as `application/octet-stream` +
-  `attachment`, so browsers **download** instead of streaming — fine as a download link,
-  useless as an embed.
+**Messages.** Real-time 1:1 chat with message requests (pending / accept), live online presence, paginated history, conversation search over a privacy allowlist, and mute support. Client-side end-to-end encryption is on the roadmap; transport is secured today.
 
-**Option A — YouTube (recommended final form, instant streaming) ⭐**
-1. Upload the mp4 to YouTube as **Unlisted** (or Public) and send the link.
-2. Swap the thumbnail link above to:
-```markdown
-[![▶ Watch the GiniVibe Demo](images/demo-thumbnail.png)](https://www.youtube.com/watch?v=YOUR_VIDEO_ID)
-```
-Visitors click → YouTube plays instantly, including on phones. No 43 MB download.
+**Events.** Full discovery-to-RSVP loop. Online events carry a meeting URL and platform; offline events carry a venue and location. Status (live / upcoming / ended) is computed at query time, RSVPs (`interested / going / declined`) are duplicate-protected, and each user gets organized and attending hubs.
 
-**Option B — GitHub's own attachment player (true inline, no YouTube)**
-1. On github.com, drag-drop the mp4 into any issue comment box (don't submit — just grab the URL).
-2. GitHub uploads it to `https://github.com/user-attachments/assets/…` — paste that bare URL
-   (or a `<video>` tag pointing at it) into the README and it renders a **true inline player**.
+**Astrology.** Personality insight, not prediction: what suits a user's personality, what each house reflects, and where their strengths point. No future forecasting — the output feeds profiles and matching instead.
 
-</details>
+**Gini AI.** Chat with AI characters and create your own (persona, greeting, backstory) for others to discover. Persistent threads, markdown-rendered replies, and a character gallery, backed by a dedicated AI service.
 
----
+**Rooms.** Group text, voice, and video spaces: create a room, invite people, talk live. Backed by a dedicated rooms service on top of the WebRTC realtime layer.
 
-## 🚀 What is GiniVibe?
+**Matching.** Personalized matching on interests and intent signals, astrology-based compatibility, and custom filters (age, city, interests, languages). This is being extended into natural-language AI search — e.g. typing "I want to connect with a founder in Delhi" resolves intent, applies privacy filtering, and returns ranked people instead of making users assemble filter combinations.
 
-GiniVibe is a **social discovery + community + live interaction platform**. Think Instagram's feed,
-WhatsApp-grade messaging ambition, Meetup's events, Discord's rooms, Character.AI's personalities,
-and Co–Star-style self-insight — **fused into one cohesive universe** with a signature
-glassmorphism design system shared across web and mobile.
+## Clients
 
-People come to GiniVibe to:
+**Web — `frontend-web/`**
 
-- 👀 **Watch what others share** — a rich multimedia feed
-- 💬 **Message anyone** — private 1:1 chat with requests, presence & typing-speed realtime
-- 📅 **Host & join events** — online *and* offline
-- 🔮 **Understand themselves** — astrology as personality insight, *never* future prediction
-- 🤖 **Chat with AI characters** — and create their own
-- 🏠 **Hang out in Rooms** — group text / voice / video spaces
-- 💘 **Meet the right people** — personalized, astrology-aware, and AI natural-language matching
+Next.js 16 (App Router), React 19, Tailwind CSS 4. Route groups keep the consumer app, B2B enterprise dashboard, and admin portal strictly separated. Global presence runs over a single socket held in a Zustand store. Layouts adapt from desktop grids to phone-width navigation without a separate mobile site.
 
----
+**Mobile — `frontend-app/`**
 
-## 🏆 Why this is genuinely *production-grade*
+Expo 57, React Native, expo-router with file-based routes (`(auth)`, `(tabs)`, `chat`, `events`, `rooms`). Reanimated transitions, BlurView glass surfaces, Skia and Lottie artwork, `expo-image` / `expo-video` / `expo-image-picker`, haptics, safe-area-aware layouts, and token sessions persisted with AsyncStorage. Run paths: `npx expo start`, then `a` for Android, `i` for iOS, or scan the QR code with Expo Go. Same backend, same auth tokens, same realtime channels as web.
 
-Anyone can scaffold a to-do app. GiniVibe is engineered like software that has to survive real users:
+## Repository structure
 
-- 🧱 **Service-oriented monorepo** — a core monolithic API (identity, feed, chat, presence)
-  plus focused microservices (events, matching, rooms, Gini AI, astrology, enterprise ads),
-  each independently runnable on its own port.
-- 🗄️ **PostgreSQL as the source of truth** — Prisma-managed schemas, relations, composite keys
-  (e.g. one like per user per post), unique constraints (one RSVP per user per event),
-  and Docker Compose for one-command local databases.
-- 🔐 **Real auth & tenancy** — JWT auth with middleware guards, role separation
-  (consumer / enterprise tenant / super-admin), tenant-isolated queries so Org A can
-  *never* touch Org B's campaigns, plus an immutable admin audit log.
-- ⚡ **Two realtime pipelines** — Socket.io for global presence & call ringing, and a
-  zero-DB pure-`ws` WebRTC signaling server for ultra-low-latency peer-to-peer video.
-- 🛡️ **Abuse thinking built in** — rate-limited search APIs, deduplicated view counting
-  (`@@unique([postId, viewerKey])` + `IntersectionObserver`), allowlist search projections,
-  LDAP-style layered request lifecycle (router → guard → controller → service → Prisma).
-- 💰 **Monetization from day one** — a native Enterprise Ad Network (campaign lifecycle
-  `DRAFT → PENDING_REVIEW → ACTIVE`, ad decision API, impression/click telemetry)
-  injected natively into the social feed.
-- 🧪 **Tested & documented like a team owns it** — seed scripts for demo data,
-  E2E testing guides, per-service READMEs, and a full `ARCHITECTURE.md` with onboarding path.
-- 🎨 **One design language everywhere** — glassmorphism cards, fluid Reanimated/Motion
-  micro-animations, Lucide icons, and safe-area-aware mobile layouts.
-
----
-
-## ✨ Feature tour
-
-### 👀 1. Feed — *watch what others share*
-The beating heart of GiniVibe. Text updates, HD images, streaming video, and community-tagged
-posts in one chronological stream — with tabs for **All / Images / Videos / Communities**,
-optimistic likes, threaded inline comments (add / edit / delete with ownership rules),
-native Web Share integration, deduplicated view counts, a `+ Create Post` modal
-(text vs. media upload via Azure Blob), and **native sponsored cards** woven in after the
-first post via the Enterprise Ad Server.
-
-### 💬 2. Messages — *message anyone, privately*
-Real-time 1:1 chat with Instagram-style **message requests** (pending / accept),
-live **online presence**, conversation search (lexical + typo-tolerant + semantic hybrid
-over an allowlist projection — never private fields), pagination, and mute support.
-> 🔒 **Honest note:** full client-side **end-to-end encryption (E2EE)** is on the roadmap —
-> transport is secured today; the README will claim E2EE only once keys never leave devices.
-> Check `backend/monolithic/src/features/chat/` for the current implementation.
-
-### 📅 3. Events — *host & join, online and offline*
-A complete discovery → creation → RSVP loop (~3,000 lines across DB + API + UI):
-- **🟢 Online events** — meeting URL + platform (Google Meet, Zoom, …), join-from-anywhere.
-- **📍 Offline events** — venue + location, show-up-in-person energy.
-- Live / Future / Ended status computed at query time (never stale), capacity limits,
-  `INTERESTED / GOING / DECLINED` RSVPs with duplicate protection, organizer profiles,
-  attendee lists, and personal hubs (*My Organized* / *My Attending*).
-
-### 🔮 4. Astrology — *know yourself, not your "future"*
-GiniVibe astrology is **self-knowledge, not fortune-telling**: what suits your personality,
-what each house says about you, and where success awaits you. No "you will meet a stranger
-on Tuesday" predictions — just premium natal-style insight that feeds matching and profiles.
-
-### 🤖 5. Gini AI — *chat with characters, or create your own*
-A dedicated AI microservice + Roleplay surfaces where users chat with AI personalities
-and **author their own characters** (persona, greeting, backstory) for others to discover.
-Markdown-rendered replies, character galleries, and persistent conversation threads.
-
-### 🏠 6. Rooms — *group spaces for many, not just two*
-Discord-style rooms for group **text, voice & video**: create a room, invite people,
-talk together live. Backed by a dedicated rooms service plus the WebRTC/LiveKit realtime layer.
-
-### 💘 7. Matching — *personalized, astrological, and now AI-powered*
-- **Personalized matching** — interest / intent / compatibility signals.
-- **Astrology matching** — synastry-style fit from personality profiles.
-- **Custom filters** — age, city, interests, languages, and more.
-- 🆕 **AI-based matching (the upgrade in progress):** the old UI label says
-  *"mood-based matching"* — that is being replaced by **natural-language AI search**.
-  Just type what you want in plain words:
-  > *"I want to connect with a founder in Delhi"*
-  …and the secure AI search engine (lexical + semantic hybrid, intent interpreter,
-  privacy-filtered, rate-limited — see `backend/monolithic/src/features/search/`)
-  finds the right people. No dropdown gymnastics. Just ask.
-
----
-
-## 📱💻 One platform, every screen — Web *and* Native
-
-This is the part most projects fake. GiniVibe ships **both**, from this repo:
-
-### 🌐 Web — responsive by design, not by accident
-- **Next.js 16 (App Router) + React 19 + Tailwind CSS 4** in `frontend-web/`.
-- Route-group architecture — `(auth)`, `(dashboard)`, `(admin-portal)`, `enterprise-dashboard`
-  — so consumer, B2B, and admin surfaces stay strictly separated.
-- Fully **responsive down to phones**: fluid grids, adaptive sidebar → bottom-nav patterns,
-  `object-fit: contain` media capped at viewport-friendly heights, touch-sized action bars.
-- Zustand-powered global presence store keeps the whole dashboard alive over one socket.
-
-### 📱 Mobile — real Android & iOS apps, not a wrapped website
-- **Expo 57 + React Native + expo-router** in `frontend-app/` — file-based navigation
-  (`(auth)`, `(tabs)`, `chat/`, `events/`, `rooms/`) mirroring the web information architecture.
-- **Run it on Android *and* iOS today**: `npm run android` / `npm run ios` / scan the QR in Expo Go.
-- Native-grade craft: Reanimated 60 fps transitions, BlurView glassmorphism, Skia + Lottie
-  illustrations, `expo-image` / `expo-video` / `expo-image-picker`, haptics, safe-area contexts,
-  async-storage persisted sessions.
-- Same backend, same JWT, same realtime — **feature parity** across feed, messages, events,
-  rooms, astrology, matching, and AI chat.
-
-> **Bragging rights, earned:** most student/startup repos ship *either* a website *or* an app.
-> GiniVibe ships a responsive web dashboard **plus** installable Android & iOS clients
-> against one unified API family. That's a product, not a project. 🚀
-
----
-
-## 🗂️ Repository map (folders only)
-
-High-level only — each service has its own README with file-level detail:
+Folder-level map. Each service directory contains its own README with file-level detail.
 
 ```
 Ginivibe-project/
-├── android/                ← native Android shell / build artifacts
+├── android/                  native Android shell and build artifacts
 ├── backend/
-│   ├── monolithic/         ← core API: auth, feed, chat, presence, search (port 3001)
+│   ├── monolithic/           core API: auth, feed, chat, presence, search (port 3001)
 │   └── microservices/
-│       ├── astrology/      ← personality-insight engine (port 3006)
-│       ├── enterprise/     ← B2B ads, billing, admin control plane (port 3005)
-│       ├── events-service/ ← events CRUD + RSVP service (port 3002)
-│       ├── Gini_AI/        ← AI characters + roleplay brains (port 3004)
-│       ├── live-matching/  ← WebRTC signaling, zero-DB ultra-low-latency (port 8080)
-│       ├── non-live-matching/ ← offline / algorithmic matching (port 3003)
-│       └── rooms-service/  ← group text / voice / video rooms (port 3007)
-├── db/                     ← Docker Compose, backup + restore scripts
-├── frontend-app/           ← Expo React Native app — Android + iOS (port 8081)
+│       ├── astrology/        personality-insight engine (port 3006)
+│       ├── enterprise/       B2B ads, billing, admin control plane (port 3005)
+│       ├── events-service/   events CRUD and RSVP service (port 3002)
+│       ├── Gini_AI/          AI characters and roleplay (port 3004)
+│       ├── live-matching/    WebRTC signaling, no database dependency (port 8080)
+│       ├── non-live-matching/ offline and algorithmic matching (port 3003)
+│       └── rooms-service/    group text, voice, and video rooms (port 3007)
+├── db/                       Docker Compose setup, backup and restore scripts
+├── frontend-app/             Expo React Native app for Android and iOS (port 8081)
 │   └── src/
-│       ├── app/            ← expo-router routes: (auth), (tabs), chat, events, rooms
+│       ├── app/              expo-router routes
 │       ├── components/
 │       ├── constants/
 │       ├── features/
 │       └── hooks/
-├── frontend-web/           ← Next.js responsive dashboard (port 3000)
-│   ├── app/                ← (auth), (dashboard), (admin-portal), enterprise-dashboard
+├── frontend-web/             Next.js responsive dashboard (port 3000)
+│   ├── app/                  (auth), (dashboard), (admin-portal), enterprise-dashboard
 │   ├── components/
 │   ├── hooks/
 │   ├── lib/
@@ -236,42 +86,30 @@ Ginivibe-project/
 │   ├── registry/
 │   ├── styles/
 │   └── types/
-├── images/                 ← static showcase assets
-└── sidebar/                ← shared sidebar design references
+├── images/                   static showcase assets
+└── sidebar/                  shared sidebar design references
 ```
 
-Deep dives: [`ARCHITECTURE.md`](./ARCHITECTURE.md) ·
-[`FEED_SYSTEM.md`](./FEED_SYSTEM.md) ·
-[`EVENTS_IMPLEMENTATION_COMPLETE.md`](./EVENTS_IMPLEMENTATION_COMPLETE.md) ·
-[`LIVE_MATCHING.md`](./LIVE_MATCHING.md) ·
-[`NON_LIVE_MATCHING.md`](./NON_LIVE_MATCHING.md) ·
-[`ADS_SYSTEM.md`](./ADS_SYSTEM.md) ·
-[`ADMIN_CONTROL_PLANE.md`](./ADMIN_CONTROL_PLANE.md) ·
-[`ENTERPRISE.md`](./ENTERPRISE.md)
+Further reading: `ARCHITECTURE.md` (system design and onboarding), `FEED_SYSTEM.md`, `EVENTS_IMPLEMENTATION_COMPLETE.md`, `LIVE_MATCHING.md`, `NON_LIVE_MATCHING.md`, `ADS_SYSTEM.md`, `ADMIN_CONTROL_PLANE.md`, `ENTERPRISE.md`.
 
----
-
-## 🧰 Tech stack
+## Tech stack
 
 | Layer | Choices |
 |---|---|
 | Web | Next.js 16, React 19, Tailwind CSS 4, Motion, Zustand, socket.io-client, LiveKit client |
-| Mobile | Expo 57, React Native 0.86, expo-router, Reanimated, Skia, Lottie, Blur, AsyncStorage |
-| Backend | Node.js 20+, Express 5, Socket.io, `ws`, Zod validation, modular services |
-| Data | PostgreSQL 16 (Docker), Prisma ORM, OpenSearch-ready hybrid search scaffolding |
-| Realtime | WebRTC P2P video + `ws` signaling; Socket.io presence; LiveKit client surfaces |
-| Media | Azure Blob uploads, expo-image / expo-video pipelines |
-| Infra | Docker Compose (local DB), per-service `npm run dev`, EAS-ready mobile builds |
+| Mobile | Expo 57, React Native 0.86, expo-router, Reanimated, Skia, Lottie, AsyncStorage |
+| Backend | Node.js 20+, Express 5, Socket.io, `ws`, Zod validation |
+| Data | PostgreSQL 16 via Docker, Prisma ORM |
+| Realtime | WebRTC peer-to-peer video with `ws` signaling; Socket.io presence |
+| Media | Azure Blob uploads; expo-image / expo-video pipelines |
+| Infra | Docker Compose for local databases; per-service `npm run dev` |
 
----
+## Running locally
 
-## ⚡ Run it locally (10 terminals, ~10 minutes)
+Prerequisites: Node.js 18 or higher (20+ recommended), Docker, Git. For mobile: an Android emulator, an iOS simulator, or the Expo Go app on a phone.
 
-### 0. Prerequisites
-- Node.js 18+ (20+ recommended) · Docker · Git
-- Android Studio emulator **or** Xcode simulator **or** the Expo Go app on your phone
+Start the database:
 
-### 1. Database
 ```bash
 cd db
 docker compose up -d
@@ -279,72 +117,58 @@ cd ../backend/monolithic
 npx prisma db push
 ```
 
-### 2. Backends (one terminal each)
+Start the backends (one terminal each):
+
 ```bash
-# Core API — auth, feed, chat, presence, search (3001)
+# Core API: auth, feed, chat, presence, search (port 3001)
 cd backend/monolithic && npm install && npm run dev
 
-# Events (3002) · Non-live matching (3003) · Gini AI (3004)
+# Events (3002), non-live matching (3003), Gini AI (3004)
 cd backend/microservices/events-service && npm install && npm run dev
 cd backend/microservices/non-live-matching && npm install && npm run dev
 cd backend/microservices/Gini_AI && npm install && npm run dev
 
-# Enterprise ads + admin (3005) · Astrology (3006) · Rooms (3007)
+# Enterprise ads and admin (3005), astrology (3006), rooms (3007)
 cd backend/microservices/enterprise && npm install && npm run dev
 cd backend/microservices/astrology && npm install && npm run dev
 cd backend/microservices/rooms-service && npm install && npm run dev
 
-# Live-matching WebRTC signaling (8080)
+# Live-matching WebRTC signaling (port 8080)
 cd backend/microservices/live-matching && npm install && npm run dev
 ```
 
-### 3. Frontends
-```bash
-# 🌐 Web dashboard (3000) — try resizing to phone width, it's fully responsive
-cd frontend-web && npm install && npm run dev
-# → http://localhost:3000
+Start the frontends:
 
-# 📱 Mobile (8081) — Android / iOS / Expo Go
+```bash
+# Web dashboard (port 3000)
+cd frontend-web && npm install && npm run dev
+
+# Mobile (port 8081)
 cd frontend-app && npm install && npx expo start
-# press `a` (Android) · `i` (iOS) · or scan the QR with Expo Go
 ```
 
-> ⚠️ Never commit secrets. Copy each service's `.env.example` → `.env` and fill in
-> `DATABASE_URL` + `JWT_SECRET` locally. Mobile must use your LAN IP
-> (`EXPO_PUBLIC_API_URL=http://192.168.x.x:3001`), not `localhost`.
+Copy each service's `.env.example` (or `.env.sample`) to `.env` and set `DATABASE_URL` and `JWT_SECRET` locally. Never commit `.env` files. The mobile app must point at your machine's LAN IP (e.g. `EXPO_PUBLIC_API_URL=http://192.168.x.x:3001`), not `localhost`.
 
-### 4. Seed demo content (optional, recommended)
+Optional demo content:
+
 ```bash
 cd backend/monolithic
-npx tsx src/seed_feed.ts   # creators, communities, posts, media
+npx tsx src/seed_feed.ts
 ```
 
----
+## Roadmap
 
-## 🗺️ Roadmap
+- Natural-language AI matching ("connect me with a founder in Delhi") across clients
+- Client-side end-to-end encrypted messaging with device-held keys
+- Push and in-app notifications for events, requests, and rooms
+- Maps for offline events, iCalendar export, organizer analytics
+- Streamed ad telemetry and Redis-backed presence for horizontal scale
+- Native WebRTC bindings on mobile (currently a WebView bridge for V1)
 
-- [ ] 🗣️ **AI natural-language matching GA** — *"connect me with a founder in Delhi"* (replacing the mood-based UI label)
-- [ ] 🔒 **True E2EE messaging** — device-held keys, verifiable by users
-- [ ] 🔔 Push + in-app notifications (events, requests, rooms)
-- [ ] 🗺️ Maps for offline events · 📅 iCalendar export · 📊 organizer analytics
-- [ ] 📦 Kafka/Redis Streams for ad telemetry at 500+ QPS · Redis-backed presence for horizontal scale
-- [ ] ⚙️ Native `react-native-webrtc` bindings (today: WebView bridge for V1 speed)
+## Contributing
 
----
+Branch off `main` (`feat/...`, `fix/...`), open a pull request, and get a review before merging. Keep diffs scoped to one service per PR. `ARCHITECTURE.md` has a "Where do I make this change?" map — check it before touching shared code.
 
-## 🤝 Contributing
+## License
 
-1. Never push straight to `main` — branch off (`feat/…`, `fix/…`), open a PR, get a review.
-2. Keep diffs scoped: one feature, one service, one PR.
-3. Read [`ARCHITECTURE.md`](./ARCHITECTURE.md) → *"Where Do I Make This Change?"* before touching shared code.
-
-## 📄 License
-
-See [`frontend-app/LICENSE`](./frontend-app/LICENSE). All rights reserved unless stated otherwise in a service directory.
-
----
-
-<p align="center">
-  <b>Built with obsession. Designed with glass. Shipped for web, Android & iOS. 💜</b><br>
-  ⭐ Star <b>Ginivibe-project</b> if you believe social can be beautiful <i>and</i> engineered.
-</p>
+See `frontend-app/LICENSE`. All rights reserved unless stated otherwise in a service directory.

@@ -15,3 +15,6 @@ coverage/
 *.pem
 *.key
 certs.bak/
+
+# local demo video - kept on disk only, served via YouTube in the README
+recording_20260915_14-09-15.mp4
